@@ -1,0 +1,468 @@
+// Dashboard functionality for GhanaHealth+
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarClose = document.getElementById('sidebar-close');
+    const profileModal = document.getElementById('profile-modal');
+    const bookingModal = document.getElementById('booking-modal');
+    const sidebarName = document.getElementById('sidebar-name');
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    const headerName = document.getElementById('header-name');
+    const headerAvatar = document.getElementById('header-avatar');
+    const nameInput = document.getElementById('profile-name-input');
+    const picInput = document.getElementById('profile-pic-input');
+    const notificationBtn = document.getElementById('notification-btn');
+    const weatherWidget = document.getElementById('weather-widget');
+
+    // Sample data
+    const doctors = [
+        { 
+            name: "Dr. Kwame Mensah", 
+            specialty: "Cardiologist", 
+            location: "Accra", 
+            rating: 4.8,
+            experience: "15 years",
+            image: "public/placeholder-user.jpg"
+        },
+        { 
+            name: "Dr. Ama Asante", 
+            specialty: "Dermatologist", 
+            location: "Kumasi", 
+            rating: 4.6,
+            experience: "12 years",
+            image: "public/placeholder-user.jpg"
+        },
+        { 
+            name: "Dr. Kojo Owusu", 
+            specialty: "General Practitioner", 
+            location: "Takoradi", 
+            rating: 4.7,
+            experience: "18 years",
+            image: "public/placeholder-user.jpg"
+        },
+        { 
+            name: "Dr. Akosua Boateng", 
+            specialty: "Pediatrician", 
+            location: "Accra", 
+            rating: 4.9,
+            experience: "20 years",
+            image: "public/placeholder-user.jpg"
+        },
+        { 
+            name: "Dr. Yaw Boadu", 
+            specialty: "Neurologist", 
+            location: "Kumasi", 
+            rating: 4.5,
+            experience: "14 years",
+            image: "public/placeholder-user.jpg"
+        }
+    ];
+
+    // Initialize dashboard
+    function initDashboard() {
+        loadUserData();
+        renderDoctors();
+        setupEventListeners();
+        showSection('overview');
+        updateWeather();
+    }
+
+    // Load user data
+    function loadUserData() {
+        // In a real app, this would come from Firebase/localStorage
+        const userData = {
+            name: "Kwame Asante",
+            email: "kwame.asante@email.com",
+            phone: "+233 24 123 4567",
+            location: "Accra, Ghana",
+            age: "28 years old",
+            avatar: "public/placeholder-user.jpg"
+        };
+
+        sidebarName.textContent = userData.name;
+        headerName.textContent = userData.name.split(' ')[0];
+        sidebarAvatar.src = userData.avatar;
+        headerAvatar.src = userData.avatar;
+    }
+
+    // Setup all event listeners
+    function setupEventListeners() {
+        // Sidebar toggle
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', toggleSidebar);
+        }
+
+        // Navigation
+        document.querySelectorAll('[data-route]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const route = btn.getAttribute('data-route');
+                showSection(route);
+                updateActiveNav(btn);
+            });
+        });
+
+        // Profile modal
+        document.getElementById('edit-profile-btn').addEventListener('click', openProfileModal);
+        document.getElementById('close-profile-modal').addEventListener('click', closeProfileModal);
+        document.getElementById('cancel-profile').addEventListener('click', closeProfileModal);
+        document.getElementById('save-profile').addEventListener('click', saveProfile);
+
+        // Booking modal
+        document.getElementById('close-booking-modal').addEventListener('click', closeBookingModal);
+        document.getElementById('close-booking').addEventListener('click', closeBookingModal);
+        document.getElementById('submit-booking').addEventListener('click', handleBookingSubmit);
+
+        // Quick actions
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('click', handleQuickAction);
+        });
+
+        // Search and filters
+        const searchInput = document.getElementById('search-doctor');
+        const locationFilter = document.getElementById('location-filter');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                renderDoctors(e.target.value.toLowerCase(), locationFilter.value);
+            });
+        }
+        
+        if (locationFilter) {
+            locationFilter.addEventListener('change', (e) => {
+                renderDoctors(searchInput.value.toLowerCase(), e.target.value);
+            });
+        }
+
+        // Notification button
+        if (notificationBtn) {
+            notificationBtn.addEventListener('click', showNotifications);
+        }
+
+        // Profile avatar edit
+        const avatarEdit = document.querySelector('.avatar-edit');
+        if (avatarEdit) {
+            avatarEdit.addEventListener('click', () => {
+                picInput.click();
+            });
+        }
+
+        // Profile picture input
+        if (picInput) {
+            picInput.addEventListener('change', handleProfilePictureChange);
+        }
+    }
+
+    // Sidebar functionality
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        document.body.classList.toggle('sidebar-open');
+    }
+
+    // Navigation functionality
+    function showSection(sectionName) {
+        // Hide all sections
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Show target section
+        const targetSection = document.getElementById(`${sectionName}-section`);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+
+        // Update active nav item
+        document.querySelectorAll('[data-route]').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-route') === sectionName) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    function updateActiveNav(activeBtn) {
+        document.querySelectorAll('[data-route]').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        activeBtn.classList.add('active');
+    }
+
+    // Profile functionality
+    function openProfileModal() {
+        profileModal.classList.remove('hidden');
+        nameInput.value = sidebarName.textContent;
+        
+        if (window.innerWidth < 768) {
+            sidebar.classList.remove('open');
+            document.body.classList.remove('sidebar-open');
+        }
+    }
+
+    function closeProfileModal() {
+        profileModal.classList.add('hidden');
+    }
+
+    function saveProfile() {
+        if (nameInput.value.trim()) {
+            sidebarName.textContent = nameInput.value.trim();
+            headerName.textContent = nameInput.value.trim().split(' ')[0];
+        }
+        closeProfileModal();
+        showToast('Profile updated successfully!');
+    }
+
+    function handleProfilePictureChange() {
+        if (picInput.files[0]) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                const newAvatar = e.target.result;
+                sidebarAvatar.src = newAvatar;
+                headerAvatar.src = newAvatar;
+                showToast('Profile picture updated!');
+            };
+            fileReader.readAsDataURL(picInput.files[0]);
+        }
+    }
+
+    // Booking functionality
+    function openBooking(doctorName) {
+        document.getElementById('booking-doctor-name').textContent = `Book Appointment with ${doctorName}`;
+        bookingModal.classList.remove('hidden');
+    }
+
+    function closeBookingModal() {
+        bookingModal.classList.add('hidden');
+        document.getElementById('book-doctor-form').reset();
+    }
+
+    function handleBookingSubmit(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const appointmentData = {
+            date: formData.get('appointment-date') || document.getElementById('appointment-date').value,
+            time: formData.get('appointment-time') || document.getElementById('appointment-time').value,
+            type: formData.get('appointment-type') || document.getElementById('appointment-type').value,
+            reason: formData.get('appointment-reason') || document.getElementById('appointment-reason').value
+        };
+
+        // Validate form
+        if (!appointmentData.date || !appointmentData.time || !appointmentData.type) {
+            showToast('Please fill in all required fields', 'error');
+            return;
+        }
+
+        // In a real app, this would save to Firebase
+        // console.log('Booking appointment:', appointmentData);
+        
+        closeBookingModal();
+        showToast('Appointment booked successfully!');
+        
+        // Add to recent activity
+        addRecentActivity('Appointment Booked', `Appointment scheduled for ${appointmentData.date} at ${appointmentData.time}`);
+    }
+
+    // Quick actions
+    function handleQuickAction(e) {
+        const actionCard = e.currentTarget;
+        const actionType = actionCard.querySelector('h3').textContent;
+        
+        switch(actionType) {
+            case 'Book Appointment':
+                showSection('doctors');
+                break;
+            case 'Quick Chat':
+                showSection('chat');
+                break;
+            case 'Emergency':
+                emergencyCall();
+                break;
+        }
+    }
+
+    function emergencyCall() {
+        if (confirm('This will initiate an emergency call. Continue?')) {
+            // In a real app, this would integrate with phone/emergency services
+            showToast('Emergency call initiated. Please stay on the line.', 'warning');
+        }
+    }
+
+    // Doctor functionality
+    function renderDoctors(filterText = "", location = "") {
+        const list = document.getElementById("doctor-list");
+        if (!list) return;
+        
+        list.innerHTML = "";
+        
+        const filteredDoctors = doctors.filter(doc =>
+            (doc.name.toLowerCase().includes(filterText) ||
+             doc.specialty.toLowerCase().includes(filterText)) &&
+            (location === "" || doc.location === location)
+        );
+
+        filteredDoctors.forEach(doc => {
+            const card = document.createElement("div");
+            card.className = "doctor-card";
+            card.innerHTML = `
+                <div class="doctor-info">
+                    <img src="${doc.image}" alt="${doc.name}" class="doctor-avatar">
+                    <div class="doctor-details">
+                        <h3>${doc.name}</h3>
+                        <p class="specialty">${doc.specialty}</p>
+                        <p class="location"><i class="fas fa-map-marker-alt"></i> ${doc.location}</p>
+                        <p class="experience"><i class="fas fa-clock"></i> ${doc.experience}</p>
+                        <div class="rating">
+                            <span class="stars">${'⭐'.repeat(Math.floor(doc.rating))}</span>
+                            <span class="rating-value">${doc.rating}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="doctor-actions">
+                    <button class="btn btn-primary book-btn" onclick="openBooking('${doc.name}')">
+                        <i class="fas fa-calendar-plus"></i> Book Appointment
+                    </button>
+                    <button class="btn btn-outline chat-btn" onclick="startChatWithDoctor('${doc.name}')">
+                        <i class="fas fa-comments"></i> Chat
+                    </button>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    // Chat functionality
+    function startChatWithDoctor(doctorName) {
+        showSection('chat');
+        showToast(`Starting chat with ${doctorName}...`);
+        // In a real app, this would open a chat interface
+    }
+
+    function startNewChat() {
+        showSection('doctors');
+        showToast('Please select a doctor to start chatting');
+    }
+
+    // Health metrics
+    function addHealthMetric() {
+        const metric = prompt('Enter health metric (e.g., Blood Pressure: 120/80)');
+        if (metric) {
+            showToast(`Health metric added: ${metric}`);
+            // In a real app, this would save to the health records
+        }
+    }
+
+    // Notifications
+    function showNotifications() {
+        // In a real app, this would show a notifications panel
+        showToast('You have 3 unread notifications');
+    }
+
+    // Recent activity
+    function addRecentActivity(title, description) {
+        const activityList = document.querySelector('.activity-list');
+        if (!activityList) return;
+
+        const activityItem = document.createElement('div');
+        activityItem.className = 'activity-item';
+        activityItem.innerHTML = `
+            <div class="activity-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="activity-content">
+                <h4>${title}</h4>
+                <p>${description}</p>
+                <span class="activity-time">Just now</span>
+            </div>
+        `;
+
+        // Insert at the top
+        activityList.insertBefore(activityItem, activityList.firstChild);
+        
+        // Remove old activities if too many
+        const activities = activityList.querySelectorAll('.activity-item');
+        if (activities.length > 5) {
+            activities[activities.length - 1].remove();
+        }
+    }
+
+    // Weather functionality
+    function updateWeather() {
+        // In a real app, this would fetch from a weather API
+        const temperature = Math.floor(Math.random() * 15) + 20; // 20-35°C
+        const weatherIcon = 'fas fa-cloud-sun';
+        
+        if (weatherWidget) {
+            weatherWidget.innerHTML = `
+                <i class="${weatherIcon}"></i>
+                <span>${temperature}°C</span>
+            `;
+        }
+    }
+
+    // Utility functions
+    function showToast(message, type = 'success') {
+        // Create toast notification
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Remove toast
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Global functions for onclick handlers
+    window.bookAppointment = function() {
+        showSection('doctors');
+    };
+
+    window.startChat = function() {
+        showSection('chat');
+    };
+
+    window.emergencyCall = function() {
+        emergencyCall();
+    };
+
+    window.addHealthMetric = function() {
+        addHealthMetric();
+    };
+
+    window.startNewChat = function() {
+        startNewChat();
+    };
+
+    window.openBooking = function(doctorName) {
+        openBooking(doctorName);
+    };
+
+    window.startChatWithDoctor = function(doctorName) {
+        startChatWithDoctor(doctorName);
+    };
+
+    window.editProfile = function() {
+        openProfileModal();
+    };
+
+    window.logout = function() {
+        if (confirm('Are you sure you want to logout?')) {
+            // In a real app, this would clear auth and redirect
+            window.location.href = 'login.html';
+        }
+    };
+
+    // Initialize dashboard
+    initDashboard();
+});

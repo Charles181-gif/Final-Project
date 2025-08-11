@@ -1,0 +1,68 @@
+/* Alternative to Font Awesome for offline use */
+/* Simple CSS-based icons */
+
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.icon-heart::before { content: "♥"; }
+.icon-user::before { content: "👤"; }
+.icon-phone::before { content: "📞"; }
+.icon-email::before { content: "✉"; }
+.icon-calendar::before { content: "📅"; }
+.icon-video::before { content: "📹"; }
+.icon-comments::before { content: "💬"; }
+.icon-star::before { content: "⭐"; }
+.icon-clock::before { content: "🕐"; }
+.icon-map::before { content: "📍"; }
+.icon-shield::before { content: "🛡"; }
+.icon-users::before { content: "👥"; }
+.icon-check::before { content: "✓"; }
+.icon-arrow-left::before { content: "←"; }
+.icon-arrow-right::before { content: "→"; }
+.icon-bars::before { content: "☰"; }
+.icon-times::before { content: "×"; }
+.icon-plus::before { content: "+"; }
+.icon-bell::before { content: "🔔"; }
+.icon-cog::before { content: "⚙"; }
+
+/* Social Icons */
+.icon-facebook::before { content: "f"; }
+.icon-twitter::before { content: "🐦"; }
+.icon-instagram::before { content: "📷"; }
+.icon-linkedin::before { content: "💼"; }
+
+/* For offline use, you can replace Font Awesome classes with these */
+.fas.fa-heart { font-family: inherit; }
+.fas.fa-heart::before { content: "♥"; color: #e74c3c; }
+
+.fas.fa-user::before { content: "👤"; }
+.fas.fa-phone::before { content: "📞"; }
+.fas.fa-envelope::before { content: "✉"; }
+.fas.fa-calendar::before { content: "📅"; }
+.fas.fa-video::before { content: "📹"; }
+.fas.fa-comments::before { content: "💬"; }
+.fas.fa-star::before { content: "⭐"; }
+.fas.fa-clock::before { content: "🕐"; }
+.fas.fa-map-marker-alt::before { content: "📍"; }
+.fas.fa-shield-alt::before { content: "🛡"; }
+.fas.fa-users::before { content: "👥"; }
+.fas.fa-check::before { content: "✓"; }
+.fas.fa-arrow-left::before { content: "←"; }
+.fas.fa-arrow-right::before { content: "→"; }
+.fas.fa-bars::before { content: "☰"; }
+.fas.fa-times::before { content: "×"; }
+.fas.fa-plus::before { content: "+"; }
+.fas.fa-bell::before { content: "🔔"; }
+.fas.fa-cog::before { content: "⚙"; }
+
+/* Fallback for when Font Awesome doesn't load */
+.fas, .fab {
+    font-family: inherit;
+    font-weight: normal;
+    font-style: normal;
+}

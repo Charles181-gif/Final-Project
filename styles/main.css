@@ -1,0 +1,795 @@
+/* ===========================
+   GLOBAL RESET & BASE STYLES
+   =========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #fff;
+    color: #333;
+}
+
+/* ===========================
+   THEME COLORS
+   =========================== */
+:root {
+    --primary: #2E7D32;
+    --primary-light: #4CAF50;
+    --primary-dark: #1B5E20;
+    --text-light: #f8f8f8;
+    --grey-light: #f4f4f4;
+    --grey-dark: #555;
+}
+
+/* ===========================
+   UTILITIES
+   =========================== */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+.btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-outline {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+.btn-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-large {
+    padding: 0.9rem 1.8rem;
+    font-size: 1rem;
+}
+
+.btn-full {
+    display: block;
+    width: 100%;
+}
+
+/* ===========================
+   HEADER & NAV
+   =========================== */
+.header {
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+}
+.nav-brand .logo i {
+    font-size: 1.8rem;
+    color: var(--primary);
+}
+.brand-text {
+    margin-left: 0.5rem;
+}
+.brand-text h1 {
+    font-size: 1.2rem;
+    color: var(--primary-dark);
+}
+.brand-text p {
+    font-size: 0.8rem;
+    color: var(--grey-dark);
+}
+/* Right-side mobile menu */
+.nav-menu {
+    position: fixed;
+    top: 0;
+    right: -250px; /* Hidden offscreen initially */
+    width: 250px;
+    height: 100vh;
+    background-color: var(--background-color);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: right 0.3s ease-in-out;
+    z-index: 999;
+}
+
+/* Show menu when active */
+.nav-menu.active {
+    right: 0;
+}
+
+/* Mobile only */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: flex;
+    }
+}
+
+.nav-link {
+    color: var(--grey-dark);
+    text-decoration: none;
+    font-weight: 500;
+}
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.nav-toggle {
+    display: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+/* ===========================
+   HERO SECTION
+   =========================== */
+.hero {
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 4rem 0;
+}
+.hero-text h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.hero-text p {
+    font-size: 1rem;
+}
+.hero-text .highlight {
+    font-weight: bold;
+    color: var(--primary-light);
+}
+.hero-buttons {
+    margin-top: 1.5rem;
+}
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* ===========================
+   SECTIONS
+   =========================== */
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.section-header h2 {
+    color: var(--primary-dark);
+}
+.section-header p {
+    color: var(--primary-light);
+}
+
+/* Services Grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+.service-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    transition: transform 0.3s;
+}
+.service-card:hover {
+    transform: translateY(-5px);
+}
+.service-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+.service-price {
+    margin-top: 0.5rem;
+    color: var(--primary-dark);
+    font-weight: bold;
+}
+
+/* Doctors Grid */
+.doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+.doctor-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    transition: transform 0.3s;
+}
+.doctor-card:hover {
+    transform: translateY(-5px);
+}
+.doctor-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+}
+
+/* Testimonials */
+.testimonial-container {
+    text-align: center;
+}
+.testimonial {
+    max-width: 600px;
+    margin: auto;
+}
+.testimonial-photo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+.testimonial-stars {
+    color: gold;
+    margin-bottom: 0.5rem;
+}
+.testimonial blockquote {
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+.testimonial-author span {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--grey-dark);
+}
+.testimonial-dots {
+    margin-top: 1rem;
+}
+.dot {
+    height: 10px;
+    width: 10px;
+    margin: 0 3px;
+    background-color: var(--grey-dark);
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+}
+.dot.active {
+    background-color: var(--primary);
+}
+
+/* CTA */
+.cta {
+    padding: 60px 20px;
+    background: linear-gradient(
+        rgba(176, 193, 211, 0.8),
+        rgba(0, 123, 255, 0.8)
+    ),
+    url("../Pictures/front-view-doctor-wearing-white-coat.jpg") center/cover no-repeat;
+    color: white;
+    text-align: center;
+}
+
+/* ===========================
+   ABOUT PAGE SPECIFIC STYLES
+   =========================== */
+
+/* Hero section for About page */
+.about-hero {
+    background: url('../Pictures/doctor-nurse-helping-wheelchair-user.jpg') center/cover no-repeat;
+    padding: 5rem 0;
+    text-align: center;
+    color: var(--text-light);
+    position: relative;
+}
+.about-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+}
+.about-hero .container {
+    position: relative;
+    z-index: 1;
+}
+.about-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.about-hero p {
+    font-size: 1.2rem;
+}
+
+/* About content */
+.about-content {
+    background: var(-);
+    padding: 3rem 0;
+}
+.about-content h2 {
+    color: var(--primary-dark);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.about-content p {
+    max-width: 800px;
+    margin: 0 auto 1rem auto;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--grey-dark);
+    text-align: center;
+}
+
+/* Testimonials section */
+.testimonials {
+    padding: 3rem 0;
+    background: white;
+    text-align: center;
+}
+.testimonials h2 {
+    color: var(--primary-dark);
+    margin-bottom: 2rem;
+}
+.testimonial {
+    display: none;
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1rem;
+    color: var(--grey-dark);
+    background: var(--grey-light);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.testimonial.active {
+    display: block;
+}
+.testimonial h4 {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+/* Dots navigation */
+.testimonial-dots {
+    margin-top: 1rem;
+}
+.testimonial-dots .dot {
+    height: 12px;
+    width: 12px;
+    background-color: var(--grey-dark);
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.testimonial-dots .dot.active {
+    background-color: var(--primary);
+}
+.testimonial-dots .dot:hover {
+    background-color: var(--primary-light);
+}
+
+/* Image enhancements */
+img.enhanced-img {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+img.enhanced-img:hover {
+    transform: scale(1.03);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+    .about-hero p {
+        font-size: 1rem;
+    }
+    .about-content p {
+        padding: 0 1rem;
+    }
+}
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+}
+
+.upload-btn {
+    cursor: pointer;
+}
+/* Auth Container */
+.auth-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e8f8f5 0%, var(--white) 100%);
+    padding: 2rem 0;
+}
+
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    margin-bottom: 2rem;
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.back-link:hover {
+    color: var(--primary-dark);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+/* Auth Content */
+.auth-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.auth-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-title h1 {
+    font-size: 2.5rem;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.auth-title p {
+    color: var(--gray-600);
+    font-size: 1.125rem;
+}
+
+/* User Type Selector */
+.user-type-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius);
+    padding: 4px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.user-type-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: none;
+    border-radius: calc(var(--border-radius) - 4px);
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.user-type-btn.active {
+    background-color: var(--white);
+    color: var(--primary-color);
+    box-shadow: var(--box-shadow);
+}
+
+.user-type-btn:hover:not(.active) {
+    color: var(--gray-800);
+}
+
+/* Auth Form */
+.auth-form {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-title h2 {
+    font-size: 1.75rem;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.form-title p {
+    color: var(--gray-600);
+}
+
+/* Section Divider */
+.section-divider {
+    border-top: 2px solid var(--gray-200);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-divider h3 {
+    color: var(--gray-800);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Password Input */
+.password-input {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.password-toggle:hover {
+    color: var(--gray-600);
+}
+
+/* Form Options */
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkbox-group label {
+    margin: 0;
+    font-weight: normal;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+/* Loading State */
+.btn-loading {
+    display: none;
+}
+
+.btn.loading .btn-text {
+    display: none;
+}
+
+.btn.loading .btn-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Auth Divider */
+.auth-divider {
+    position: relative;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--gray-300);
+}
+
+.auth-divider span {
+    background-color: var(--white);
+    color: var(--gray-500);
+    padding: 0 1rem;
+    font-size: 0.875rem;
+}
+
+/* Social Buttons */
+.social-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+
+
+/* ===========================
+   REGISTER SECTION
+   =========================== */
+#register {
+    background: linear-gradient(
+            rgba(255, 255, 255, 0.85),
+            rgba(255, 255, 255, 0.85)
+        ),
+        url("../Pictures/nurse-preparing-their-shift.jpg") center/cover no-repeat;
+    padding: 4rem 2rem;
+}
+
+#register .register-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+#register h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+#register p {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+#register form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#register input,
+#register select {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: no-repeat;
+}
+
+#register input:focus,
+#register select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+}
+
+#register button {
+    background: var(--primary-color);
+    color: #000000;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+#register button:hover {
+    background: var(--primary-dark);
+}
+
+#register button:active {
+    transform: scale(0.98);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #register .register-container {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+}

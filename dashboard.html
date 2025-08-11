@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - GhanaHealth+</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h2>GhanaHealth+</h2>
+                </div>
+                <button class="sidebar-close" id="sidebar-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-route="overview">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="appointments">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Appointments</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="doctors">
+                    <i class="fas fa-user-md"></i>
+                    <span>Find Doctors</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="chat">
+                    <i class="fas fa-comments"></i>
+                    <span>Messages</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="health">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Health Records</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                    <div class="nav-indicator"></div>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <img src="public/placeholder-user.jpg" alt="User Avatar" id="sidebar-avatar">
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="sidebar-name">Kwame Asante</span>
+                        <span class="user-role">Patient</span>
+                    </div>
+                </div>
+                <button class="nav-item" id="edit-profile-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <button class="nav-item logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="header-content">
+                        <h1>Welcome back, <span id="header-name">Kwame</span>! 👋</h1>
+                        <p>Here's your health overview for today</p>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="notification-btn" id="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="weather-widget" id="weather-widget">
+                        <i class="fas fa-cloud-sun"></i>
+                        <span>24°C</span>
+                    </div>
+                    <div class="user-avatar" id="header-avatar">
+                        <img src="public/placeholder-user.jpg" alt="User Avatar">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Overview Section -->
+                <section id="overview-section" class="dashboard-section active">
+                    <div class="section-header">
+                        <div class="header-left">
+                            <h2><i class="fas fa-chart-line"></i> Health Overview</h2>
+                            <p>Monitor your key health metrics</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="addHealthMetric()">
+                            <i class="fas fa-plus"></i> Add Metric
+                        </button>
+                    </div>
+                    
+                    <div class="health-metrics">
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>Blood Pressure</h3>
+                                <div class="metric-value">120/80</div>
+                                <div class="metric-status normal">
+                                    <i class="fas fa-check-circle"></i>
+                                    Normal
+                                </div>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>2%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>Heart Rate</h3>
+                                <div class="metric-value">72 bpm</div>
+                                <div class="metric-status normal">
+                                    <i class="fas fa-check-circle"></i>
+                                    Normal
+                                </div>
+                            </div>
+                            <div class="metric-trend down">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>5%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-weight"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>Weight</h3>
+                                <div class="metric-value">70 kg</div>
+                                <div class="metric-status stable">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Stable
+                                </div>
+                            </div>
+                            <div class="metric-trend stable">
+                                <i class="fas fa-minus"></i>
+                                <span>0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>BMI</h3>
+                                <div class="metric-value">22.5</div>
+                                <div class="metric-status normal">
+                                    <i class="fas fa-check-circle"></i>
+                                    Healthy
+                                </div>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>1%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <div class="action-card" onclick="bookAppointment()">
+                            <div class="action-icon">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                            <div class="action-content">
+                                <h3>Book Appointment</h3>
+                                <p>Schedule with a doctor</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="action-card" onclick="startChat()">
+                            <div class="action-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="action-content">
+                                <h3>Quick Chat</h3>
+                                <p>Instant consultation</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="action-card" onclick="emergencyCall()">
+                            <div class="action-icon emergency">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="action-content">
+                                <h3>Emergency</h3>
+                                <p>24/7 support</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <div class="section-header">
+                            <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Appointment Booked</h4>
+                                    <p>Dr. Akosua Darko - Tomorrow at 10:00 AM</p>
+                                    <span class="activity-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Message Received</h4>
+                                    <p>Dr. Kwame Osei sent you a message</p>
+                                    <span class="activity-time">1 day ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Appointments Section -->
+                <section id="appointments-section" class="dashboard-section">
+                    <div class="section-header">
+                        <div class="header-left">
+                            <h2><i class="fas fa-calendar-alt"></i> My Appointments</h2>
+                            <p>Manage your scheduled consultations</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="bookAppointment()">
+                            <i class="fas fa-plus"></i> Book New
+                        </button>
+                    </div>
+                    
+                    <div class="appointments-list">
+                        <div class="appointment-card">
+                            <div class="appointment-info">
+                                <div class="doctor-info">
+                                    <img src="public/placeholder-user.jpg" alt="Dr. Akosua Darko" class="doctor-avatar">
+                                    <div>
+                                        <h3>Dr. Akosua Darko</h3>
+                                        <p class="specialty">General Practice</p>
+                                    </div>
+                                </div>
+                                <div class="appointment-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Jan 15, 2024 at 10:00 AM</span>
+                                </div>
+                                <div class="appointment-type">
+                                    <i class="fas fa-video"></i>
+                                    <span>Video Call</span>
+                                </div>
+                            </div>
+                            <div class="appointment-status confirmed">
+                                <span>Confirmed</span>
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="appointment-card">
+                            <div class="appointment-info">
+                                <div class="doctor-info">
+                                    <img src="public/placeholder-user.jpg" alt="Dr. Kwame Osei" class="doctor-avatar">
+                                    <div>
+                                        <h3>Dr. Kwame Osei</h3>
+                                        <p class="specialty">Cardiology</p>
+                                    </div>
+                                </div>
+                                <div class="appointment-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Jan 18, 2024 at 2:30 PM</span>
+                                </div>
+                                <div class="appointment-type">
+                                    <i class="fas fa-comments"></i>
+                                    <span>Chat Consultation</span>
+                                </div>
+                            </div>
+                            <div class="appointment-status pending">
+                                <span>Pending</span>
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Doctors Section -->
+                <section id="doctors-section" class="dashboard-section">
+                    <div class="section-header">
+                        <div class="header-left">
+                            <h2><i class="fas fa-user-md"></i> Find Doctors</h2>
+                            <p>Connect with healthcare professionals</p>
+                        </div>
+                        <div class="search-filters">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-doctor" placeholder="Search doctors...">
+                            </div>
+                            <select id="location-filter" class="location-filter">
+                                <option value="">All Locations</option>
+                                <option value="Accra">Accra</option>
+                                <option value="Kumasi">Kumasi</option>
+                                <option value="Takoradi">Takoradi</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="doctor-list" class="doctors-grid">
+                        <!-- Doctors will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Chat Section -->
+                <section id="chat-section" class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-comments"></i> Messages</h2>
+                        <button class="btn btn-primary" onclick="startNewChat()">
+                            <i class="fas fa-plus"></i> New Chat
+                        </button>
+                    </div>
+                    
+                    <div class="messages-list">
+                        <div class="message-card unread">
+                            <div class="message-avatar">
+                                <img src="public/placeholder-user.jpg" alt="Dr. Efua Asante">
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <h3>Dr. Efua Asante</h3>
+                                    <span class="message-time">2 hours ago</span>
+                                </div>
+                                <p>Your test results are ready for review. Please schedule a follow-up.</p>
+                            </div>
+                            <div class="message-status">
+                                <span class="unread-badge"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="message-card">
+                            <div class="message-avatar">
+                                <img src="public/placeholder-user.jpg" alt="Dr. Akosua Darko">
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <h3>Dr. Akosua Darko</h3>
+                                    <span class="message-time">1 day ago</span>
+                                </div>
+                                <p>Remember to take your medication as prescribed.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Health Records Section -->
+                <section id="health-section" class="dashboard-section">
+                    <div class="section-header">
+                        <div class="header-left">
+                            <h2><i class="fas fa-heartbeat"></i> Health Records</h2>
+                            <p>View and manage your medical information</p>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Record
+                        </button>
+                    </div>
+                    
+                    <div class="health-records">
+                        <div class="record-card">
+                            <div class="record-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="record-content">
+                                <h3>Medical History</h3>
+                                <p>No significant medical history recorded.</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm">Add</button>
+                        </div>
+                        
+                        <div class="record-card">
+                            <div class="record-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="record-content">
+                                <h3>Allergies</h3>
+                                <p>No known allergies.</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm">Add</button>
+                        </div>
+                        
+                        <div class="record-card">
+                            <div class="record-icon">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <div class="record-content">
+                                <h3>Medications</h3>
+                                <p>No current medications.</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm">Add</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Profile Section -->
+                <section id="profile-section" class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user"></i> Profile</h2>
+                        <button class="btn btn-outline" onclick="editProfile()">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                    </div>
+                    
+                    <div class="profile-content">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <img src="public/placeholder-user.jpg" alt="Profile Picture">
+                                <button class="avatar-edit">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="profile-info">
+                                <h3>Kwame Asante</h3>
+                                <p class="profile-role">Patient</p>
+                                <div class="profile-stats">
+                                    <div class="stat">
+                                        <span class="stat-number">12</span>
+                                        <span class="stat-label">Appointments</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-number">5</span>
+                                        <span class="stat-label">Doctors</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-number">8</span>
+                                        <span class="stat-label">Messages</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>kwame.asante@email.com</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+233 24 123 4567</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Accra, Ghana</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>28 years old</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal hidden" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Profile</h3>
+                <button class="modal-close" id="close-profile-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="profile-name-input">Full Name</label>
+                    <input type="text" id="profile-name-input" value="Kwame Asante">
+                </div>
+                <div class="form-group">
+                    <label for="profile-pic-input">Profile Picture</label>
+                    <input type="file" id="profile-pic-input" accept="image/*">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancel-profile" class="btn btn-outline">Cancel</button>
+                <button type="button" id="save-profile" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal hidden" id="booking-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="booking-doctor-name">Book Appointment</h3>
+                <button class="modal-close" id="close-booking-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="book-doctor-form">
+                    <div class="form-group">
+                        <label for="appointment-date">Date</label>
+                        <input type="date" id="appointment-date" name="appointment-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-time">Time</label>
+                        <input type="time" id="appointment-time" name="appointment-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-type">Type</label>
+                        <select id="appointment-type" name="appointment-type" required>
+                            <option value="video">Video Call</option>
+                            <option value="chat">Chat</option>
+                            <option value="voice">Voice Call</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-reason">Reason</label>
+                        <textarea id="appointment-reason" name="appointment-reason" placeholder="Brief description of your symptoms or reason for visit"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="close-booking" class="btn btn-outline">Cancel</button>
+                <button type="button" id="submit-booking" class="btn btn-primary">Book Appointment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app-config.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/weather-api.js"></script>
+</body>
+</html>
