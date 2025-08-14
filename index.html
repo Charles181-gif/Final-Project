@@ -457,6 +457,78 @@
     <script src="js/main.js"></script>
     <script type="module" src="js/home.js"></script>
     <script src="js/weather-api.js"></script>
+    
+    <!-- Registration fallback script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registerForm');
+        if (form) {
+            console.log('Fallback registration handler loaded');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('Registration form submitted via fallback');
+                
+                const formData = new FormData(form);
+                const name = formData.get('name')?.trim();
+                const email = formData.get('email')?.trim();
+                const password = formData.get('password');
+                const confirmPassword = formData.get('confirmPassword');
+                const terms = formData.get('terms');
+                
+                // Basic validation
+                if (!name || !email || !password || !confirmPassword) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+                
+                if (!terms) {
+                    alert('You must agree to the Terms & Conditions.');
+                    return;
+                }
+                
+                try {
+                    // Simple localStorage registration
+                    const users = JSON.parse(localStorage.getItem('ghanahealth_users') || '[]');
+                    const userExists = users.find(user => user.email === email);
+                    
+                    if (userExists) {
+                        alert('An account with this email already exists.');
+                        return;
+                    }
+                    
+                    const newUser = {
+                        id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        email,
+                        full_name: name,
+                        user_type: 'patient',
+                        created_at: new Date().toISOString(),
+                        active: true
+                    };
+                    
+                    users.push(newUser);
+                    localStorage.setItem('ghanahealth_users', JSON.stringify(users));
+                    
+                    alert('Account created successfully! Redirecting to login...');
+                    form.reset();
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    alert('Registration failed. Please try again.');
+                }
+            });
+        }
+    });
+    </script>
 
 </body>
 </html>

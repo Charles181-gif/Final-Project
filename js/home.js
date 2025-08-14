@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initScrollAnimations();
     
     // Initialize registration form if present
-    initHomeRegistrationForm();
+    setTimeout(() => {
+        initHomeRegistrationForm();
+    }, 100);
     
     // Initialize health metrics preview
     initHealthMetricsPreview();
@@ -482,6 +484,8 @@ function initHomeRegistrationForm() {
     const form = document.getElementById('registerForm');
     if (!form) return;
     
+    console.log('Registration form found, initializing...');
+    
     const submitButton = form.querySelector('button[type="submit"]');
     
     // Password toggles
@@ -490,26 +494,42 @@ function initHomeRegistrationForm() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirmPassword');
 
-    if (passwordToggle) {
-        passwordToggle.addEventListener('click', () => {
+    if (passwordToggle && password) {
+        passwordToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             const isPassword = password.getAttribute('type') === 'password';
             password.setAttribute('type', isPassword ? 'text' : 'password');
-            passwordToggle.querySelector('i').classList.toggle('fa-eye');
-            passwordToggle.querySelector('i').classList.toggle('fa-eye-slash');
+            const icon = passwordToggle.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
         });
     }
 
-    if (confirmPasswordToggle) {
-        confirmPasswordToggle.addEventListener('click', () => {
+    if (confirmPasswordToggle && confirmPassword) {
+        confirmPasswordToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             const isPassword = confirmPassword.getAttribute('type') === 'password';
             confirmPassword.setAttribute('type', isPassword ? 'text' : 'password');
-            confirmPasswordToggle.querySelector('i').classList.toggle('fa-eye');
-            confirmPasswordToggle.querySelector('i').classList.toggle('fa-eye-slash');
+            const icon = confirmPasswordToggle.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
         });
     }
     
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        console.log('Form submitted!');
+        
+        // Ensure utils is available
+        if (!window.utils) {
+            console.error('Utils not available');
+            alert('System error. Please refresh the page.');
+            return;
+        }
         
         window.utils.hideError('errorMessage');
         window.utils.showLoading(submitButton);
@@ -521,6 +541,8 @@ function initHomeRegistrationForm() {
             const password = formData.get('password');
             const confirmPassword = formData.get('confirmPassword');
             const terms = formData.get('terms');
+
+            console.log('Form data:', { name, email, password: '***', confirmPassword: '***', terms });
 
             // Basic validations
             if (!name || !email || !password || !confirmPassword) {
@@ -552,8 +574,17 @@ function initHomeRegistrationForm() {
             try {
                 // Use fallback authentication
                 console.log('Using fallback authentication system');
-                const fallbackResult = await authFallback.signUp(email, password, { full_name: name });
                 
+                // Import authFallback dynamically if not available
+                let authSystem = window.authFallback;
+                if (!authSystem) {
+                    const { authFallback } = await import('./auth-fallback.js');
+                    authSystem = authFallback;
+                }
+                
+                const fallbackResult = await authSystem.signUp(email, password, { full_name: name });
+                
+                console.log('Registration successful:', fallbackResult);
                 window.utils.showSuccess('Account created successfully! Redirecting to login...');
                 form.reset();
                 
@@ -562,9 +593,17 @@ function initHomeRegistrationForm() {
                 }, 1500);
                 return;
             } catch (fallbackError) {
+                console.error('Fallback registration error:', fallbackError);
                 // If fallback fails, try Supabase as backup
                 try {
-                    const { data, error } = await supabase.auth.signUp({
+                    // Import supabase dynamically if not available
+                    let supabaseClient = window.supabase;
+                    if (!supabaseClient) {
+                        const { supabase } = await import('./supabase-config.js');
+                        supabaseClient = supabase;
+                    }
+                    
+                    const { data, error } = await supabaseClient.auth.signUp({
                         email,
                         password,
                         options: {
@@ -580,7 +619,7 @@ function initHomeRegistrationForm() {
 
                     // Create minimal patient profile document
                     if (user) {
-                        const { error: insertError } = await supabase
+                        const { error: insertError } = await supabaseClient
                             .from('users')
                             .insert({
                                 id: user.id,
@@ -604,6 +643,7 @@ function initHomeRegistrationForm() {
                     }, 1500);
                     
                 } catch (signUpError) {
+                    console.error('Supabase registration error:', signUpError);
                     throw signUpError;
                 }
             }
@@ -614,11 +654,23 @@ function initHomeRegistrationForm() {
             if (error?.message?.includes('Password should be')) message = 'Password is too weak.';
             if (error?.message?.includes('Invalid email')) message = 'Invalid email address.';
             if (error?.message?.includes('captcha')) message = 'Registration temporarily unavailable. Please try again later.';
-            window.utils.showError('errorMessage', message);
+            
+            // Fallback error display if utils fails
+            if (window.utils) {
+                window.utils.showError('errorMessage', message);
+            } else {
+                alert(message);
+            }
         } finally {
-            window.utils.hideLoading(submitButton);
+            if (window.utils) {
+                window.utils.hideLoading(submitButton);
+            } else {
+                submitButton.disabled = false;
+            }
         }
     });
+    
+    console.log('Registration form event listener added');
 }
 
 // Add dashboard preview functionality

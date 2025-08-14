@@ -1,7 +1,9 @@
 // Main JavaScript functionality
+console.log('Main.js loaded');
 
 // Mobile Navigation Toggle
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - main.js');
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
     
@@ -195,6 +197,7 @@ window.addEventListener('error', function(e) {
 
 // Export utils for use in other scripts
 window.utils = utils;
+console.log('Utils exported to window:', window.utils);
 
 // ===========================
 // POLICY POPUPS
