@@ -3,5 +3,5 @@
 window.APP_CONFIG = {
   // OpenWeatherMap API key
   // Get one from https://openweathermap.org/api
-  OPENWEATHER_API_KEY: ''
+  OPENWEATHER_API_KEY: 'demo_key_fallback'
 };

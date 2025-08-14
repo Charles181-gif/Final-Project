@@ -1,7 +1,6 @@
 // forgot-password.js
 
-import { auth } from "./firebase-config.js";
-import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+import { supabase } from "./supabase-config.js";
 
 const form = document.getElementById("forgotPasswordForm");
 const emailInput = document.getElementById("email");
@@ -25,7 +24,10 @@ form.addEventListener("submit", async (e) => {
     btnLoading.style.display = "inline-flex";
 
     try {
-        await sendPasswordResetEmail(auth, email);
+        const { error } = await supabase.auth.resetPasswordForEmail(email);
+        
+        if (error) throw error;
+        
         successMessageEl.textContent = "Password reset link sent to your email.";
         successMessageEl.style.display = "block";
         emailInput.value = "";

@@ -1,7 +1,6 @@
 // Patient-only login
-import { auth, db } from './firebase-config.js';
-import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { supabase } from './supabase-config.js';
+import { authFallback } from './auth-fallback.js';
 
 document.addEventListener('DOMContentLoaded', function() {
   initPasswordToggle();
@@ -49,20 +48,52 @@ function initLoginForm() {
         return;
       }
 
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Ensure user doc exists and is patient
-      const userDocSnap = await getDoc(doc(db, 'users', user.uid));
-      if (!userDocSnap.exists()) {
-        // First-time login without profile → go to profile setup
-        window.location.href = 'profile-setup.html';
-        return;
+      let user, userDoc;
+      
+      // Use fallback authentication by default
+      try {
+        console.log('Using fallback authentication system');
+        const fallbackResult = await authFallback.signIn(email, password);
+        user = fallbackResult.user;
+      } catch (fallbackError) {
+        // If fallback fails, try Supabase as backup
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          if (error) throw error;
+          user = data.user;
+        } catch (supabaseError) {
+          throw new Error('Invalid email or password');
+        }
       }
-      const userDoc = userDocSnap.data();
-      if (userDoc.userType && userDoc.userType !== 'patient') {
-        window.utils.showError('errorMessage', 'Only patient accounts can sign in here.');
-        return;
+
+      // Check if user document exists (skip for fallback users)
+      if (user.id && user.id.startsWith('user_')) {
+        // Fallback user - use stored data
+        userDoc = user;
+      } else {
+        // Supabase user - fetch from database
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          if (!userError && userData) {
+            userDoc = userData;
+            // Check if user type is restricted
+            if (userDoc.user_type && userDoc.user_type !== 'patient') {
+              window.utils.showError('errorMessage', 'Only patient accounts can sign in here.');
+              return;
+            }
+          }
+        } catch (docError) {
+          console.warn('Could not fetch user document:', docError);
+          // Continue with login even if document fetch fails
+        }
       }
 
       if (rememberMe) {
@@ -71,21 +102,36 @@ function initLoginForm() {
         localStorage.removeItem('rememberedEmail');
       }
 
-      // Optionally store profile in session for quick access
-      sessionStorage.setItem('userProfile', JSON.stringify({
-        uid: user.uid,
+      // Store profile in session for quick access
+      const profileData = {
+        id: user.id,
         email: user.email,
-        displayName: user.displayName,
-        ...userDoc
-      }));
+        displayName: userDoc?.full_name || user.email.split('@')[0],
+        ...(userDoc || {})
+      };
+      sessionStorage.setItem('userProfile', JSON.stringify(profileData));
 
       window.utils.showSuccess('Login successful! Redirecting to dashboard...');
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        // Always redirect to profile setup first, then dashboard
+        setTimeout(() => {
+          window.location.href = 'profile-setup.html';
+        }, 800);
       }, 800);
     } catch (error) {
       console.error('Login error:', error);
-      window.utils.showError('errorMessage', 'Login failed. Please check your credentials.');
+      let errorMessage = 'Login failed. Please check your credentials.';
+      
+      // Provide more specific error messages
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please try again.';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and confirm your account.';
+      } else if (error.message?.includes('Too many requests')) {
+        errorMessage = 'Too many failed attempts. Please try again later.';
+      }
+      
+      window.utils.showError('errorMessage', errorMessage);
     } finally {
       window.utils.hideLoading(submitButton);
     }

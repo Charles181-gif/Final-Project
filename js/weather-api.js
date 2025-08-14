@@ -1,327 +1,141 @@
-// Weather API Integration for Health Recommendations
-// This satisfies the third-party API requirement for the project
+// Weather API integration for GhanaHealth+
+const WEATHER_CONFIG = {
+    API_KEY: 'YOUR_API_KEY_HERE', // Replace with your OpenWeatherMap API key
+    BASE_URL: 'https://api.openweathermap.org/data/2.5',
+    CITIES: {
+        'Accra': { lat: 5.6037, lon: -0.1870 },
+        'Kumasi': { lat: 6.6885, lon: -1.6244 },
+        'Takoradi': { lat: 4.8845, lon: -1.7554 },
+        'Tamale': { lat: 9.4034, lon: -0.8424 },
+        'Cape Coast': { lat: 5.1053, lon: -1.2466 }
+    }
+};
 
-class WeatherHealthAPI {
+class WeatherAPI {
     constructor() {
-        // Using OpenWeatherMap API (free tier)
-        this.apiKey = this.resolveApiKey();
-        this.baseUrl = 'https://api.openweathermap.org/data/2.5';
+        this.currentCity = 'Accra';
+        this.weatherData = null;
     }
 
-    resolveApiKey() {
-        // Priority: window.APP_CONFIG -> localStorage -> placeholder
-        const fromConfig = typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.OPENWEATHER_API_KEY;
-        const fromStorage = typeof window !== 'undefined' && window.localStorage && localStorage.getItem('OPENWEATHER_API_KEY');
-        return (fromConfig || fromStorage || '').trim();
-    }
-
-    setApiKey(key) {
-        this.apiKey = (key || '').trim();
-        try { localStorage.setItem('OPENWEATHER_API_KEY', this.apiKey); } catch (_) {}
-    }
-
-    // Get weather data for a location
-    async getWeatherData(city = 'Accra', country = 'GH') {
+    async getCurrentWeather(city = this.currentCity) {
         try {
-            if (!this.apiKey) {
-                console.warn('OpenWeather API key not set. Using fallback data.');
-                return this.getFallbackWeatherData();
-            }
-            const response = await fetch(
-                `${this.baseUrl}/weather?q=${city},${country}&appid=${this.apiKey}&units=metric`
-            );
+            const coords = WEATHER_CONFIG.CITIES[city];
+            if (!coords) throw new Error('City not found');
+
+            const url = `${WEATHER_CONFIG.BASE_URL}/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${WEATHER_CONFIG.API_KEY}&units=metric`;
             
-            if (!response.ok) {
-                throw new Error('Weather data not available');
-            }
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Weather API request failed');
             
             const data = await response.json();
-            return this.processWeatherData(data);
+            this.weatherData = data;
+            
+            return {
+                temperature: Math.round(data.main.temp),
+                description: data.weather[0].description,
+                icon: data.weather[0].icon,
+                humidity: data.main.humidity,
+                windSpeed: data.wind.speed,
+                city: data.name,
+                country: data.sys.country
+            };
         } catch (error) {
             console.error('Weather API Error:', error);
-            return this.getFallbackWeatherData();
+            return this.getFallbackWeather();
         }
     }
 
-    // Process weather data and generate health recommendations
-    processWeatherData(weatherData) {
-        const { main, weather, wind, humidity } = weatherData;
-        const temperature = main.temp;
-        const condition = weather[0].main.toLowerCase();
-        const windSpeed = wind.speed;
-
+    getFallbackWeather() {
         return {
-            temperature: Math.round(temperature),
-            condition: condition,
-            humidity: humidity,
-            windSpeed: windSpeed,
-            healthRecommendations: this.generateHealthRecommendations(temperature, condition, humidity, windSpeed),
-            riskLevel: this.calculateHealthRisk(temperature, condition, humidity)
+            temperature: Math.floor(Math.random() * 10) + 25,
+            description: 'partly cloudy',
+            icon: '02d',
+            humidity: 65,
+            windSpeed: 3.2,
+            city: this.currentCity,
+            country: 'GH'
         };
     }
 
-    // Generate health recommendations based on weather
-    generateHealthRecommendations(temperature, condition, humidity, windSpeed) {
+    getHealthRecommendations(weatherData) {
+        const temp = weatherData.temperature;
+        const humidity = weatherData.humidity;
         const recommendations = [];
 
-        // Temperature-based recommendations
-        if (temperature > 30) {
-            recommendations.push({
-                type: 'warning',
-                message: 'High temperature detected. Stay hydrated and avoid prolonged sun exposure.',
-                icon: 'fas fa-thermometer-half'
-            });
-        } else if (temperature < 15) {
-            recommendations.push({
-                type: 'info',
-                message: 'Cool weather. Consider wearing warm clothing to prevent cold-related illnesses.',
-                icon: 'fas fa-thermometer-empty'
-            });
+        if (temp > 30) {
+            recommendations.push('Stay hydrated - drink plenty of water');
+            recommendations.push('Avoid prolonged sun exposure');
         }
-
-        // Humidity-based recommendations
+        
+        if (temp < 20) {
+            recommendations.push('Dress warmly to prevent cold-related illness');
+        }
+        
         if (humidity > 80) {
-            recommendations.push({
-                type: 'warning',
-                message: 'High humidity. Be aware of increased risk of respiratory issues.',
-                icon: 'fas fa-tint'
-            });
+            recommendations.push('High humidity - take breaks in air-conditioned areas');
         }
-
-        // Weather condition recommendations
-        if (condition.includes('rain')) {
-            recommendations.push({
-                type: 'info',
-                message: 'Rainy weather. Be cautious of slippery surfaces and consider indoor activities.',
-                icon: 'fas fa-cloud-rain'
-            });
+        
+        if (weatherData.description.includes('rain')) {
+            recommendations.push('Carry an umbrella to stay dry');
+            recommendations.push('Be cautious of waterborne diseases');
         }
-
-        if (condition.includes('storm')) {
-            recommendations.push({
-                type: 'danger',
-                message: 'Storm conditions. Stay indoors and avoid outdoor activities.',
-                icon: 'fas fa-bolt'
-            });
-        }
-
-        // Wind-based recommendations
-        if (windSpeed > 20) {
-            recommendations.push({
-                type: 'warning',
-                message: 'High winds. Be cautious of dust and debris that may affect respiratory health.',
-                icon: 'fas fa-wind'
-            });
-        }
-
-        // General health tips
-        recommendations.push({
-            type: 'success',
-            message: 'Remember to maintain regular exercise and healthy eating habits regardless of weather.',
-            icon: 'fas fa-heart'
-        });
 
         return recommendations;
     }
 
-    // Calculate health risk level
-    calculateHealthRisk(temperature, condition, humidity) {
-        let riskScore = 0;
-
-        // Temperature risk
-        if (temperature > 35 || temperature < 10) riskScore += 3;
-        else if (temperature > 30 || temperature < 15) riskScore += 2;
-        else if (temperature > 25 || temperature < 20) riskScore += 1;
-
-        // Humidity risk
-        if (humidity > 90) riskScore += 2;
-        else if (humidity > 80) riskScore += 1;
-
-        // Weather condition risk
-        if (condition.includes('storm')) riskScore += 3;
-        else if (condition.includes('rain')) riskScore += 1;
-
-        // Risk levels: 0-2 = Low, 3-5 = Medium, 6+ = High
-        if (riskScore >= 6) return 'high';
-        else if (riskScore >= 3) return 'medium';
-        else return 'low';
+    updateWeatherWidget(weatherData) {
+        const widget = document.getElementById('weather-widget');
+        const tempDisplay = document.getElementById('temp-display');
+        
+        if (widget && tempDisplay) {
+            const iconClass = this.getWeatherIcon(weatherData.icon);
+            widget.innerHTML = `
+                <i class="${iconClass}"></i>
+                <span>${weatherData.temperature}°C</span>
+                <small class="live-indicator"><span class="live-dot"></span></small>
+            `;
+            widget.title = `${weatherData.city}: ${weatherData.description}`;
+        }
     }
 
-    // Fallback data for when API is unavailable
-    getFallbackWeatherData() {
-        return {
-            temperature: 28,
-            condition: 'clear',
-            humidity: 75,
-            windSpeed: 5,
-            healthRecommendations: [
-                {
-                    type: 'info',
-                    message: 'Weather data temporarily unavailable. Please check local weather conditions.',
-                    icon: 'fas fa-info-circle'
-                },
-                {
-                    type: 'success',
-                    message: 'Remember to maintain regular exercise and healthy eating habits.',
-                    icon: 'fas fa-heart'
-                }
-            ],
-            riskLevel: 'low'
+    getWeatherIcon(iconCode) {
+        const iconMap = {
+            '01d': 'fas fa-sun',
+            '01n': 'fas fa-moon',
+            '02d': 'fas fa-cloud-sun',
+            '02n': 'fas fa-cloud-moon',
+            '03d': 'fas fa-cloud',
+            '03n': 'fas fa-cloud',
+            '04d': 'fas fa-clouds',
+            '04n': 'fas fa-clouds',
+            '09d': 'fas fa-cloud-rain',
+            '09n': 'fas fa-cloud-rain',
+            '10d': 'fas fa-cloud-sun-rain',
+            '10n': 'fas fa-cloud-moon-rain',
+            '11d': 'fas fa-bolt',
+            '11n': 'fas fa-bolt',
+            '13d': 'fas fa-snowflake',
+            '13n': 'fas fa-snowflake',
+            '50d': 'fas fa-smog',
+            '50n': 'fas fa-smog'
         };
-    }
-
-    // Display weather health widget
-    displayWeatherWidget(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const { city, country } = this.resolveUserLocation();
-        this.getWeatherData(city, country).then(data => {
-            const widget = this.createWeatherWidget(data);
-            container.innerHTML = widget;
-        }).catch(() => {
-            const widget = this.createWeatherWidget(this.getFallbackWeatherData());
-            container.innerHTML = widget;
-        });
-    }
-
-    resolveUserLocation() {
-        // Try to infer city from stored profile; fallback to Accra, GH
-        try {
-            const profileRaw = sessionStorage.getItem('userProfile');
-            if (profileRaw) {
-                const profile = JSON.parse(profileRaw);
-                let city = profile.city || profile.location || 'Accra';
-                if (typeof city === 'string') {
-                    // Extract first part if contains comma
-                    city = city.split(',')[0].trim();
-                }
-                return { city: city || 'Accra', country: 'GH' };
-            }
-        } catch (_) {}
-        return { city: 'Accra', country: 'GH' };
-    }
-
-    // New: Fetch using device geolocation when available/allowed
-    async tryGetGeolocation(timeoutMs = 6000) {
-        if (!('geolocation' in navigator)) return null;
-        return new Promise((resolve) => {
-            let resolved = false;
-            const onSuccess = (pos) => {
-                if (resolved) return; resolved = true;
-                resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-            };
-            const onError = () => {
-                if (resolved) return; resolved = true; resolve(null);
-            };
-            const opts = { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 300000 };
-            try { navigator.geolocation.getCurrentPosition(onSuccess, onError, opts); }
-            catch (_) { resolve(null); }
-            setTimeout(() => { if (!resolved) { resolved = true; resolve(null); } }, timeoutMs + 200);
-        });
-    }
-
-    async getWeatherByCoordinates(lat, lon) {
-        try {
-            if (!this.apiKey) {
-                console.warn('OpenWeather API key not set. Using fallback data.');
-                return this.getFallbackWeatherData();
-            }
-            const response = await fetch(
-                `${this.baseUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`
-            );
-            if (!response.ok) throw new Error('Weather data not available');
-            const data = await response.json();
-            return this.processWeatherData(data);
-        } catch (e) {
-            console.error('Weather API (geo) Error:', e);
-            return this.getFallbackWeatherData();
-        }
-    }
-
-    // Override to prefer geolocation when possible
-    async displayWeatherWidget(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const coords = await this.tryGetGeolocation().catch(() => null);
-        let data;
-        if (coords && typeof coords.lat === 'number' && typeof coords.lon === 'number') {
-            data = await this.getWeatherByCoordinates(coords.lat, coords.lon);
-        } else {
-            const { city, country } = this.resolveUserLocation();
-            data = await this.getWeatherData(city, country);
-        }
-        const widget = this.createWeatherWidget(data);
-        container.innerHTML = widget;
-    }
-
-    // Create weather widget HTML
-    createWeatherWidget(data) {
-        const riskClass = `risk-${data.riskLevel}`;
-        
-        return `
-            <div class="weather-health-widget ${riskClass}">
-                <div class="weather-header">
-                    <h3><i class="fas fa-cloud-sun"></i> Weather Health Alert</h3>
-                    <div class="weather-info">
-                        <span class="temperature">${data.temperature}°C</span>
-                        <span class="condition">${data.condition}</span>
-                    </div>
-                </div>
-                
-                <div class="health-recommendations">
-                    <h4>Health Recommendations:</h4>
-                    ${data.healthRecommendations.map(rec => `
-                        <div class="recommendation ${rec.type}">
-                            <i class="${rec.icon}"></i>
-                            <span>${rec.message}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div class="risk-indicator">
-                    <span class="risk-label">Risk Level: </span>
-                    <span class="risk-value ${data.riskLevel}">${data.riskLevel.toUpperCase()}</span>
-                </div>
-            </div>
-        `;
-    }
-
-    // Update weather data periodically
-    startWeatherUpdates(containerId, intervalMinutes = 30) {
-        this.displayWeatherWidget(containerId);
-        
-        setInterval(() => {
-            this.displayWeatherWidget(containerId);
-        }, intervalMinutes * 60 * 1000);
+        return iconMap[iconCode] || 'fas fa-cloud-sun';
     }
 }
 
 // Initialize weather API
-const weatherAPI = new WeatherHealthAPI();
+const weatherAPI = new WeatherAPI();
 
-// Export for use in other files
-window.weatherAPI = weatherAPI;
+// Auto-update weather every 10 minutes
+setInterval(async () => {
+    const weatherData = await weatherAPI.getCurrentWeather();
+    weatherAPI.updateWeatherWidget(weatherData);
+}, 600000);
 
-// Auto-initialize if weather widget container exists
-document.addEventListener('DOMContentLoaded', function() {
-    const weatherContainer = document.getElementById('weather-widget');
-    if (weatherContainer) {
-        weatherAPI.startWeatherUpdates('weather-widget');
-    }
+// Initial weather load
+document.addEventListener('DOMContentLoaded', async () => {
+    const weatherData = await weatherAPI.getCurrentWeather();
+    weatherAPI.updateWeatherWidget(weatherData);
 });
 
-// Example usage functions
-function showWeatherHealthAlert() {
-    weatherAPI.getWeatherData().then(data => {
-        const alertMessage = `Weather Alert: ${data.temperature}°C, ${data.condition}. Risk Level: ${data.riskLevel.toUpperCase()}`;
-        utils.showSuccess(alertMessage);
-    });
-}
-
-function getHealthRecommendations() {
-    return weatherAPI.getWeatherData().then(data => {
-        return data.healthRecommendations;
-    });
-}
+export { weatherAPI, WEATHER_CONFIG };

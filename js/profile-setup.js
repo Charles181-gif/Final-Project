@@ -1,9 +1,20 @@
-import { auth, db, storage } from './firebase-config.js';
-import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { supabase } from './supabase-config.js';
+import { authFallback } from './auth-fallback.js';
 
-onAuthStateChanged(auth, (user) => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check fallback auth first
+  let user = await authFallback.getCurrentUser();
+  
+  if (!user) {
+    // Try Supabase as backup
+    try {
+      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+      user = supabaseUser;
+    } catch (error) {
+      console.log('Supabase auth check failed:', error.message);
+    }
+  }
+  
   if (!user) {
     window.location.href = 'login.html';
   } else {
@@ -24,30 +35,60 @@ function initProfileForm(user) {
     const notifications = document.getElementById('notifications').checked;
     const file = document.getElementById('profilePic').files[0];
 
-    let photoURL = '';
+    let avatarUrl = '';
     if (file) {
-      const storageRef = ref(storage, `profiles/${user.uid}`);
-      await uploadBytes(storageRef, file);
-      photoURL = await getDownloadURL(storageRef);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('profiles')
+        .upload(fileName, file, { upsert: true });
+      
+      if (!uploadError) {
+        const { data } = supabase.storage
+          .from('profiles')
+          .getPublicUrl(fileName);
+        avatarUrl = data.publicUrl;
+      }
     }
 
-    // Preserve userType=patient if already stored
-    const docData = {
-      fullName,
+    const profileData = {
+      full_name: fullName,
       age,
       phone,
       location,
       gender,
-      bloodType: bloodType || null,
+      blood_type: bloodType || null,
       notifications: !!notifications,
-      photoURL,
-      email: user.email,
-      userType: 'patient',
-      updatedAt: new Date()
+      avatar_url: avatarUrl,
+      user_type: 'patient',
+      updated_at: new Date().toISOString()
     };
 
-    await setDoc(doc(db, 'users', user.uid), docData, { merge: true });
+    // Save to localStorage for fallback users
+    if (user.id && user.id.startsWith('user_')) {
+      const users = JSON.parse(localStorage.getItem('ghanahealth_users') || '[]');
+      const userIndex = users.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        users[userIndex] = { ...users[userIndex], ...profileData };
+        localStorage.setItem('ghanahealth_users', JSON.stringify(users));
+        localStorage.setItem('ghanahealth_current_user', JSON.stringify(users[userIndex]));
+      }
+    } else {
+      // Try Supabase for non-fallback users
+      const { error } = await supabase
+        .from('users')
+        .update(profileData)
+        .eq('id', user.id);
 
-    window.location.href = 'dashboard.html';
+      if (error) {
+        console.error('Error updating profile:', error);
+      }
+    }
+    
+    // Always redirect to dashboard after profile setup
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 1000);
   });
 }

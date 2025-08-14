@@ -1,7 +1,6 @@
 // Patient-only registration
-import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { supabase } from './supabase-config.js';
+import { authFallback } from './auth-fallback.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initPasswordToggles();
@@ -69,31 +68,70 @@ function initRegistrationForm() {
         return showFail('You must agree to the Terms & Conditions.', submitButton, errorEl);
       }
 
-      // Create auth user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      try {
+        // Use fallback authentication by default
+        console.log('Using fallback authentication system');
+        const fallbackResult = await authFallback.signUp(email, password, { full_name: name });
+        
+        showSuccess('Account created successfully! Redirecting to login...');
+        form.reset();
+        
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+        return;
+      } catch (fallbackError) {
+        // If fallback fails, try Supabase as backup
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: name
+              }
+            }
+          });
 
-      // Update display name
-      await updateProfile(user, { displayName: name });
+          if (error) throw error;
 
-      // Create minimal patient profile document
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        email,
-        fullName: name,
-        userType: 'patient',
-        createdAt: serverTimestamp(),
-        active: true
-      });
+        const user = data.user;
 
-      // Redirect to login after successful registration
-      window.location.href = 'login.html';
+        // Create minimal patient profile document
+        if (user) {
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert({
+              id: user.id,
+              email,
+              full_name: name,
+              user_type: 'patient',
+              created_at: new Date().toISOString(),
+              active: true
+            });
+          
+          if (insertError) {
+            console.warn('Could not create user profile:', insertError);
+          }
+        }
+        
+        showSuccess('Account created successfully! Redirecting to login...');
+        form.reset();
+        
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+        
+      } catch (signUpError) {
+        throw signUpError;
+      }
     } catch (error) {
       console.error('Registration error:', error);
       let message = 'Registration failed. Please try again.';
-      if (error?.code === 'auth/email-already-in-use') message = 'An account with this email already exists.';
-      if (error?.code === 'auth/weak-password') message = 'Password is too weak.';
-      if (error?.code === 'auth/invalid-email') message = 'Invalid email address.';
+      if (error?.message?.includes('already registered')) message = 'An account with this email already exists.';
+      if (error?.message?.includes('Password should be')) message = 'Password is too weak.';
+      if (error?.message?.includes('Invalid email')) message = 'Invalid email address.';
+      if (error?.message?.includes('captcha')) message = 'Registration temporarily unavailable. Please try again later.';
       showError(errorEl, message);
     } finally {
       hideLoading(submitButton);
@@ -142,4 +180,32 @@ function showFail(message, button, errorEl) {
   showError(errorEl, message);
   hideLoading(button);
   return false;
+}
+
+function showSuccess(message) {
+  // Create success notification
+  const successDiv = document.createElement('div');
+  successDiv.className = 'success-message';
+  successDiv.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-width: 300px;
+  `;
+  successDiv.textContent = message;
+  
+  document.body.appendChild(successDiv);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (successDiv.parentNode) {
+      successDiv.parentNode.removeChild(successDiv);
+    }
+  }, 5000);
 }

@@ -7,6 +7,1661 @@
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/dashboard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Hospital Theme - White & Light Blue Gradient */
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #e6f3ff 50%, #cce7ff 100%);
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        .dashboard-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            border-radius: 12px;
+            margin: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 102, 204, 0.1);
+            border: 1px solid rgba(204, 231, 255, 0.5);
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #0066cc #f8fbff;
+            border-right: 2px solid rgba(204, 231, 255, 0.3);
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #f8fbff;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #0066cc;
+            border-radius: 3px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #1a365d;
+        }
+        
+        .main-content {
+            background: linear-gradient(135deg, #ffffff 0%, #e6f3ff 100%);
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            border-bottom: 1px solid rgba(204, 231, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+            border-left: 4px solid #0066cc;
+        }
+        
+        .metric-card, .action-card, .tele-card, .chart-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+            border: 1px solid rgba(204, 231, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .metric-card:hover, .action-card:hover, .tele-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.2);
+            border-color: #0066cc;
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-item:hover::before {
+            left: 100%;
+        }
+        
+        .telemedicine-grid, .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .tele-card, .chart-card, .insights-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .tele-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .tele-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffffff 0%, #cce7ff 50%, #99d6ff 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+            border: 2px solid rgba(0, 102, 204, 0.2);
+        }
+        
+        .tele-icon i {
+            color: #0066cc;
+            font-size: 1.5rem;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #ffffff 0%, #e6f3ff 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            border: 1px solid rgba(204, 231, 255, 0.3);
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+        
+        .text-success { color: #38a169; }
+        .text-warning { color: #ed8936; }
+        .text-info { color: #0066cc; }
+        
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .symptom-item:hover {
+            border-color: #0066cc;
+            background: linear-gradient(135deg, #ffffff 0%, #e6f3ff 100%);
+        }
+        
+        .symptom-item input:checked + span {
+            color: #0066cc;
+            font-weight: 600;
+        }
+        
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .tele-icon {
+            width: 70px;
+            height: 70px;
+            background: 
+                linear-gradient(135deg, #0066cc 0%, #00a86b 50%, #0066cc 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 102, 204, 0.3),
+                0 4px 16px rgba(0, 168, 107, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tele-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        /* Emergency Button Enhancement */
+        .emergency-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 50% !important;
+            width: 48px !important;
+            height: 48px !important;
+            box-shadow: 
+                0 8px 32px rgba(220, 53, 69, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            animation: emergency-pulse 2s infinite !important;
+            position: relative !important;
+        }
+        
+        .emergency-btn:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 
+                0 12px 40px rgba(220, 53, 69, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        }
+        
+        @keyframes emergency-pulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 8px 32px rgba(220, 53, 69, 0.4),
+                    0 0 0 0 rgba(220, 53, 69, 0.7),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 8px 32px rgba(220, 53, 69, 0.4),
+                    0 0 0 8px rgba(220, 53, 69, 0),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        /* Medical Status Colors */
+        .status-critical {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            animation: critical-blink 1s infinite;
+        }
+        
+        .status-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+        
+        .status-stable {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .status-normal {
+            background: linear-gradient(135deg, #0066cc 0%, #00a86b 100%);
+            color: white;
+        }
+        
+        @keyframes critical-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+        
+        .tele-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        /* Enhanced Chart Styling */
+        .chart-placeholder {
+            height: 220px;
+            background: 
+                linear-gradient(135deg, rgba(248, 251, 255, 0.8) 0%, rgba(240, 248, 255, 0.6) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            border: 2px solid rgba(0, 102, 204, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(0, 102, 204, 0.02) 20px,
+                    rgba(0, 102, 204, 0.02) 21px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(0, 168, 107, 0.02) 20px,
+                    rgba(0, 168, 107, 0.02) 21px
+                );
+            pointer-events: none;
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+        
+        .text-success { color: #38a169; }
+        .text-warning { color: #ed8936; }
+        .text-info { color: #0066cc; }
+        
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        /* Enhanced Symptom Checker */
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid rgba(0, 102, 204, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 251, 255, 0.8) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .symptom-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #0066cc 0%, #00a86b 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .symptom-item:hover {
+            border-color: rgba(0, 102, 204, 0.3);
+            background: 
+                linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(0, 168, 107, 0.03) 100%);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 8px 32px rgba(0, 102, 204, 0.1),
+                0 4px 16px rgba(0, 168, 107, 0.05);
+        }
+        
+        .symptom-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .symptom-item input:checked + span {
+            color: #0066cc;
+            font-weight: 600;
+        }
+        
+        .symptom-results {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .disclaimer {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 1rem;
+        }
+        
+        /* Real-time chat enhancements */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        
+        /* Enhanced Status Indicators */
+        .online-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, #38a169 0%, #2d7d32 100%);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 
+                0 2px 8px rgba(56, 161, 105, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            animation: pulse-online 2s infinite;
+        }
+        
+        @keyframes pulse-online {
+            0%, 100% { 
+                box-shadow: 
+                    0 2px 8px rgba(56, 161, 105, 0.4),
+                    0 0 0 0 rgba(56, 161, 105, 0.7),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 2px 8px rgba(56, 161, 105, 0.4),
+                    0 0 0 4px rgba(56, 161, 105, 0),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+        }
+        
+        .online-status.offline {
+            background: #6c757d;
+        }
+        
+        .message-avatar {
+            position: relative;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 2px;
+            margin-top: 0.5rem;
+        }
+        
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: #0066cc;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        .quick-reply {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .quick-reply input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .quick-reply button {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+        }
+        
+        /* Enhanced Badge Styling */
+        .unread-badge {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            box-shadow: 
+                0 4px 12px rgba(220, 53, 69, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: badge-pulse 1.5s infinite;
+            border: 2px solid white;
+        }
+        
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .notification-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            box-shadow: 
+                0 4px 12px rgba(255, 107, 107, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: notification-glow 2s infinite;
+        }
+        
+        @keyframes notification-glow {
+            0%, 100% { 
+                box-shadow: 
+                    0 4px 12px rgba(255, 107, 107, 0.4),
+                    0 0 0 0 rgba(255, 107, 107, 0.7),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 4px 12px rgba(255, 107, 107, 0.4),
+                    0 0 0 6px rgba(255, 107, 107, 0),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        /* Enhanced Medical Typography */
+        .section-header h2 {
+            background: linear-gradient(135deg, #0066cc 0%, #00a86b 50%, #0066cc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .section-header h2::before {
+            content: '⚕';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            background: linear-gradient(135deg, #0066cc, #00a86b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.6;
+            background-clip: text;
+        }
+        
+        .metric-value {
+            background: linear-gradient(135deg, #0066cc, #00a86b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .activity-item, .order-item, .message-card {
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.95) 100%);
+            border: 1px solid rgba(0, 102, 204, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .activity-item:hover, .order-item:hover, .message-card:hover {
+            transform: translateX(8px);
+            box-shadow: 
+                0 8px 32px rgba(0, 102, 204, 0.1),
+                -4px 0 16px rgba(0, 168, 107, 0.05);
+            border-color: rgba(0, 102, 204, 0.15);
+        }
+        
+        .activity-item::before, .order-item::before, .message-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #0066cc 0%, #00a86b 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .activity-item:hover::before, .order-item:hover::before, .message-card:hover::before {
+            opacity: 1;
+        }
+        
+        .activity-item:hover, .order-item:hover, .message-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                margin: 0.5rem;
+                border-radius: 15px;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                height: 100vh;
+                width: 280px;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .dashboard-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-left {
+                width: 100%;
+            }
+            
+            .header-actions {
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .health-metrics {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .doctor-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .doctor-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+            }
+            
+            .telemedicine-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .symptom-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .search-filters {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .health-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric-card {
+                padding: 1rem;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .sidebar-nav .nav-item span {
+                font-size: 0.875rem;
+            }
+            
+            .modal-content {
+                margin: 0.5rem;
+            }
+        }
+        
+        /* Emergency button styling */
+        .emergency-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            animation: pulse 2s infinite;
+        }
+        
+        .emergency-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        
+        /* Enhanced mobile navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 0.5rem;
+            z-index: 1000;
+        }
+        
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: color 0.2s;
+        }
+        
+        .mobile-nav-item.active {
+            color: #0066cc;
+        }
+        
+        .mobile-nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Pharmacy styles */
+        .pharmacy-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .pharmacy-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .pharmacy-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-card i {
+            font-size: 2rem;
+            color: #0066cc;
+            filter: drop-shadow(0 2px 4px rgba(0, 102, 204, 0.2));
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a365d;
+            font-family: 'Inter', monospace;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .pharmacy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .medication-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .medication-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .med-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .med-badge.prescription {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .med-badge:not(.prescription) {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .med-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #0066cc, #00a86b);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 
+                0 8px 24px rgba(0, 102, 204, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .med-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: med-shimmer 4s infinite;
+        }
+        
+        @keyframes med-shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .med-icon i {
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .med-description {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .med-price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #0066cc;
+            margin: 0.5rem 0;
+            font-family: 'Inter', monospace;
+        }
+        
+        .med-unit {
+            font-size: 0.875rem;
+            font-weight: normal;
+            color: #666;
+        }
+        
+        .med-stock {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .med-stock.in-stock {
+            color: #38a169;
+        }
+        
+        .med-stock.low-stock {
+            color: #ed8936;
+        }
+        
+        .med-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .rating-text {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .med-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pharmacy-bottom {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .prescription-history, .delivery-info {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .order-status.delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .order-status.processing {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .order-status.shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .order-price {
+            font-weight: bold;
+            color: #0066cc;
+            font-family: 'Inter', monospace;
+        }
+        
+        .delivery-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .delivery-option i {
+            font-size: 1.5rem;
+            color: #0066cc;
+        }
+        
+        /* Voice Call Modal */
+        .call-interface {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .call-status .doctor-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .call-status .doctor-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .call-state {
+            color: #38a169;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        
+        .call-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin: 1rem 0;
+        }
+        
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .call-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mute-btn, .speaker-btn {
+            background: #6c757d;
+        }
+        
+        .end-btn {
+            background: #dc3545;
+        }
+        
+        .call-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* E-Prescription Modal */
+        .prescription-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .prescription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .prescription-date {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
+        .medication-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .medication-item strong {
+            color: #007bff;
+        }
+        
+        .refills {
+            color: #38a169;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        
+        .prescription-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        /* Enhanced Symptom Checker */
+        .symptom-checker-steps .step {
+            display: none;
+        }
+        
+        .symptom-checker-steps .step.active {
+            display: block;
+        }
+        
+        .symptom-categories {
+            display: grid;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .category-group h5 {
+            color: #0066cc;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .symptom-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .symptom-options label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .duration-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .duration-options label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .step-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        
+        .analysis-results {
+            margin: 1.5rem 0;
+        }
+        
+        .result-item {
+            margin-bottom: 1rem;
+        }
+        
+        .condition-probability {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .condition-probability.high {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .condition-probability.medium {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .probability {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0066cc;
+            min-width: 60px;
+            font-family: 'Inter', monospace;
+        }
+        
+        .recommendations {
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .recommendations ul {
+            margin: 0.5rem 0 0 1rem;
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        /* Weather Alert */
+        .weather-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 300px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .weather-alert i:first-child {
+            color: #0066cc;
+            font-size: 1.2rem;
+        }
+        
+        .weather-alert button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        
+        .weather-alert button:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .pharmacy-bottom {
+                grid-template-columns: 1fr;
+            }
+            
+            .pharmacy-filters {
+                flex-direction: column;
+            }
+            
+            .pharmacy-actions {
+                flex-direction: column;
+            }
+            
+            .call-controls {
+                gap: 1rem;
+            }
+            
+            .call-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+            
+            .symptom-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-actions {
+                flex-direction: column;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .tele-card, .chart-card, .insights-card {
+                background: #2d3748;
+                color: white;
+            }
+            
+            .chart-placeholder {
+                background: #4a5568;
+            }
+            
+            .symptom-item {
+                background: #2d3748;
+                border-color: #4a5568;
+                color: white;
+            }
+            
+            .symptom-results {
+                background: #4a5568;
+            }
+            
+            .mobile-nav {
+                background: #2d3748;
+                border-top-color: #4a5568;
+            }
+        }
+        
+        /* Real-time indicators */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #38a169;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #38a169;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .real-time-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .real-time-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0066cc, transparent);
+            animation: loading 2s infinite;
+        }
+        
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Enhanced responsive breakpoints */
+        @media (max-width: 1200px) {
+            .health-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-header {
+                padding: 1rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .search-filters {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-nav {
+                display: block;
+            }
+            
+            .main-content {
+                padding-bottom: 80px;
+            }
+            
+            .dashboard-container {
+                position: relative;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .chat-container {
+                height: 400px;
+            }
+            
+            .quick-reply {
+                padding: 0.75rem;
+            }
+            
+            .quick-reply input {
+                padding: 0.5rem 1rem;
+            }
+            
+            .health-metrics {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .metric-card {
+                padding: 1rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .telemedicine-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .tele-card {
+                padding: 1rem;
+                text-align: center;
+            }
+            
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .doctor-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            .doctor-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+                margin-top: 1rem;
+            }
+            
+            .appointments-list .appointment-card {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .appointment-info {
+                width: 100%;
+            }
+            
+            .messages-list .message-card {
+                padding: 1rem;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+            }
+            
+            .modal-body {
+                max-height: 60vh;
+                overflow-y: auto;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-header h1 {
+                font-size: 1.25rem;
+            }
+            
+            .header-actions {
+                gap: 0.5rem;
+            }
+            
+            .weather-widget {
+                display: none;
+            }
+            
+            .telemedicine-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .symptom-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .stat {
+                text-align: center;
+            }
+            
+            .mobile-nav-item span {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-content {
+                padding: 1rem 0.5rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.25rem;
+            }
+            
+            .metric-card {
+                padding: 0.75rem;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .action-card {
+                padding: 1rem;
+            }
+            
+            .modal-content {
+                margin: 0.5rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -45,9 +1700,24 @@
                     <span>Messages</span>
                     <div class="nav-indicator"></div>
                 </button>
+                <button class="nav-item" data-route="telemedicine">
+                    <i class="fas fa-video"></i>
+                    <span>Telemedicine</span>
+                    <div class="nav-indicator"></div>
+                </button>
                 <button class="nav-item" data-route="health">
                     <i class="fas fa-heartbeat"></i>
                     <span>Health Records</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-item" data-route="pharmacy">
+                    <i class="fas fa-pills"></i>
+                    <span>Pharmacy</span>
                     <div class="nav-indicator"></div>
                 </button>
                 <button class="nav-item" data-route="profile">
@@ -60,7 +1730,7 @@
             <div class="sidebar-footer">
                 <div class="user-info">
                     <div class="user-avatar">
-                        <img src="public/placeholder-user.jpg" alt="User Avatar" id="sidebar-avatar">
+                        <img src="Pictures/portrait-african-american-woman-working-as-doctor.jpg" alt="User Avatar" id="sidebar-avatar">
                     </div>
                     <div class="user-details">
                         <span class="user-name" id="sidebar-name">Kwame Asante</span>
@@ -73,7 +1743,7 @@
                 </button>
                 <button class="nav-item logout-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+                    <span>Sign Out</span>
                 </button>
             </div>
         </aside>
@@ -100,10 +1770,14 @@
                     </button>
                     <div class="weather-widget" id="weather-widget">
                         <i class="fas fa-cloud-sun"></i>
-                        <span>24°C</span>
+                        <span id="temp-display">24°C</span>
+                        <small class="live-indicator"><span class="live-dot"></span></small>
                     </div>
+                    <button class="emergency-btn" onclick="emergencyCall()" title="Emergency">
+                        <i class="fas fa-phone"></i>
+                    </button>
                     <div class="user-avatar" id="header-avatar">
-                        <img src="public/placeholder-user.jpg" alt="User Avatar">
+                        <img src="Pictures/portrait-african-american-woman-working-as-doctor.jpg" alt="User Avatar">
                     </div>
                 </div>
             </header>
@@ -123,13 +1797,13 @@
                     </div>
                     
                     <div class="health-metrics">
-                        <div class="metric-card">
+                        <div class="metric-card real-time-card">
                             <div class="metric-icon">
                                 <i class="fas fa-heartbeat"></i>
                             </div>
                             <div class="metric-content">
-                                <h3>Blood Pressure</h3>
-                                <div class="metric-value">120/80</div>
+                                <h3>Blood Pressure <span class="live-indicator"><span class="live-dot"></span>Live</span></h3>
+                                <div class="metric-value" id="bp-value">120/80</div>
                                 <div class="metric-status normal">
                                     <i class="fas fa-check-circle"></i>
                                     Normal
@@ -137,17 +1811,17 @@
                             </div>
                             <div class="metric-trend up">
                                 <i class="fas fa-arrow-up"></i>
-                                <span>2%</span>
+                                <span id="bp-trend">2%</span>
                             </div>
                         </div>
                         
-                        <div class="metric-card">
+                        <div class="metric-card real-time-card">
                             <div class="metric-icon">
                                 <i class="fas fa-heart"></i>
                             </div>
                             <div class="metric-content">
-                                <h3>Heart Rate</h3>
-                                <div class="metric-value">72 bpm</div>
+                                <h3>Heart Rate <span class="live-indicator"><span class="live-dot"></span>Live</span></h3>
+                                <div class="metric-value" id="hr-value">72 bpm</div>
                                 <div class="metric-status normal">
                                     <i class="fas fa-check-circle"></i>
                                     Normal
@@ -155,7 +1829,7 @@
                             </div>
                             <div class="metric-trend down">
                                 <i class="fas fa-arrow-down"></i>
-                                <span>5%</span>
+                                <span id="hr-trend">5%</span>
                             </div>
                         </div>
                         
@@ -283,7 +1957,7 @@
                         <div class="appointment-card">
                             <div class="appointment-info">
                                 <div class="doctor-info">
-                                    <img src="public/placeholder-user.jpg" alt="Dr. Akosua Darko" class="doctor-avatar">
+                                    <img src="Pictures/cheerful-ethnic-doctor-with-arms-crossed.jpg" alt="Dr. Akosua Darko" class="doctor-avatar">
                                     <div>
                                         <h3>Dr. Akosua Darko</h3>
                                         <p class="specialty">General Practice</p>
@@ -307,7 +1981,7 @@
                         <div class="appointment-card">
                             <div class="appointment-info">
                                 <div class="doctor-info">
-                                    <img src="public/placeholder-user.jpg" alt="Dr. Kwame Osei" class="doctor-avatar">
+                                    <img src="Pictures/male-working-as-paediatrician.jpg" alt="Dr. Kwame Osei" class="doctor-avatar">
                                     <div>
                                         <h3>Dr. Kwame Osei</h3>
                                         <p class="specialty">Cardiology</p>
@@ -342,7 +2016,7 @@
                                 <i class="fas fa-search"></i>
                                 <input type="text" id="search-doctor" placeholder="Search doctors...">
                             </div>
-                            <select id="location-filter" class="location-filter">
+                            <select id="location-filter" class="location-filter" title="Filter doctors by location">
                                 <option value="">All Locations</option>
                                 <option value="Accra">Accra</option>
                                 <option value="Kumasi">Kumasi</option>
@@ -359,40 +2033,54 @@
                 <!-- Chat Section -->
                 <section id="chat-section" class="dashboard-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-comments"></i> Messages</h2>
+                        <h2><i class="fas fa-comments"></i> Messages <span class="live-indicator"><span class="live-dot"></span>Live</span></h2>
                         <button class="btn btn-primary" onclick="startNewChat()">
                             <i class="fas fa-plus"></i> New Chat
                         </button>
                     </div>
                     
-                    <div class="messages-list">
-                        <div class="message-card unread">
-                            <div class="message-avatar">
-                                <img src="public/placeholder-user.jpg" alt="Dr. Efua Asante">
-                            </div>
-                            <div class="message-content">
-                                <div class="message-header">
-                                    <h3>Dr. Efua Asante</h3>
-                                    <span class="message-time">2 hours ago</span>
+                    <div class="chat-container">
+                        <div class="messages-list" id="messages-list">
+                            <div class="message-card unread real-time-card">
+                                <div class="message-avatar">
+                                    <img src="Pictures/man-working-as-paediatrician.jpg" alt="Dr. Efua Asante">
+                                    <div class="online-status"></div>
                                 </div>
-                                <p>Your test results are ready for review. Please schedule a follow-up.</p>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <h3>Dr. Efua Asante</h3>
+                                        <span class="message-time" data-time="2">2 hours ago</span>
+                                    </div>
+                                    <p>Your test results are ready for review. Please schedule a follow-up.</p>
+                                    <div class="typing-indicator hidden">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                </div>
+                                <div class="message-status">
+                                    <span class="unread-badge">1</span>
+                                </div>
                             </div>
-                            <div class="message-status">
-                                <span class="unread-badge"></span>
+                            
+                            <div class="message-card">
+                                <div class="message-avatar">
+                                    <img src="Pictures/nurse-preparing-their-shift.jpg" alt="Dr. Akosua Darko">
+                                    <div class="online-status offline"></div>
+                                </div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <h3>Dr. Akosua Darko</h3>
+                                        <span class="message-time" data-time="24">1 day ago</span>
+                                    </div>
+                                    <p>Remember to take your medication as prescribed.</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="message-card">
-                            <div class="message-avatar">
-                                <img src="public/placeholder-user.jpg" alt="Dr. Akosua Darko">
-                            </div>
-                            <div class="message-content">
-                                <div class="message-header">
-                                    <h3>Dr. Akosua Darko</h3>
-                                    <span class="message-time">1 day ago</span>
-                                </div>
-                                <p>Remember to take your medication as prescribed.</p>
-                            </div>
+                        <div class="quick-reply">
+                            <input type="text" placeholder="Type a quick reply..." id="quick-reply-input">
+                            <button class="btn btn-primary" onclick="sendQuickReply()" title="Send message">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -404,7 +2092,7 @@
                             <h2><i class="fas fa-heartbeat"></i> Health Records</h2>
                             <p>View and manage your medical information</p>
                         </div>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" onclick="openHealthModal()">
                             <i class="fas fa-plus"></i> Add Record
                         </button>
                     </div>
@@ -416,9 +2104,9 @@
                             </div>
                             <div class="record-content">
                                 <h3>Medical History</h3>
-                                <p>No significant medical history recorded.</p>
+                                <p>Hypertension (2020), Diabetes Type 2 (2021)</p>
                             </div>
-                            <button class="btn btn-outline btn-sm">Add</button>
+                            <button class="btn btn-outline btn-sm" onclick="viewRecord('history')" title="View medical history">View</button>
                         </div>
                         
                         <div class="record-card">
@@ -427,9 +2115,9 @@
                             </div>
                             <div class="record-content">
                                 <h3>Allergies</h3>
-                                <p>No known allergies.</p>
+                                <p>Penicillin, Shellfish</p>
                             </div>
-                            <button class="btn btn-outline btn-sm">Add</button>
+                            <button class="btn btn-outline btn-sm" onclick="viewRecord('allergies')" title="View allergies">View</button>
                         </div>
                         
                         <div class="record-card">
@@ -437,10 +2125,380 @@
                                 <i class="fas fa-pills"></i>
                             </div>
                             <div class="record-content">
-                                <h3>Medications</h3>
-                                <p>No current medications.</p>
+                                <h3>Current Medications</h3>
+                                <p>Metformin 500mg, Lisinopril 10mg</p>
                             </div>
-                            <button class="btn btn-outline btn-sm">Add</button>
+                            <button class="btn btn-outline btn-sm" onclick="viewRecord('medications')" title="View medications">View</button>
+                        </div>
+                        
+                        <div class="record-card">
+                            <div class="record-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div class="record-content">
+                                <h3>Lab Results</h3>
+                                <p>Blood Test (Jan 2024), X-Ray (Dec 2023)</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="viewRecord('labs')" title="View lab results">View</button>
+                        </div>
+                        
+                        <div class="record-card">
+                            <div class="record-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="record-content">
+                                <h3>Vaccination Records</h3>
+                                <p>COVID-19 (2023), Flu Shot (2023)</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="viewRecord('vaccines')" title="View vaccination records">View</button>
+                        </div>
+                        
+                        <div class="record-card">
+                            <div class="record-icon">
+                                <i class="fas fa-user-friends"></i>
+                            </div>
+                            <div class="record-content">
+                                <h3>Emergency Contacts</h3>
+                                <p>2 contacts added</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="viewRecord('emergency')" title="Manage emergency contacts">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Telemedicine Section -->
+                <section id="telemedicine-section" class="dashboard-section">
+                    <div class="section-header">
+                        <div class="header-left">
+                            <h2><i class="fas fa-video"></i> Telemedicine</h2>
+                            <p>Virtual consultations and remote monitoring</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="startVideoCall()">
+                            <i class="fas fa-video"></i> Start Call
+                        </button>
+                    </div>
+                    
+                    <div class="telemedicine-grid">
+                        <div class="tele-card">
+                            <div class="tele-icon">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <h3>Video Consultation</h3>
+                            <p>Face-to-face consultation with doctors</p>
+                            <button class="btn btn-outline" onclick="startVideoCall()">Start Video</button>
+                        </div>
+                        
+                        <div class="tele-card">
+                            <div class="tele-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <h3>Voice Call</h3>
+                            <p>Audio consultation for quick advice</p>
+                            <button class="btn btn-outline" onclick="startVoiceCall()">Start Call</button>
+                        </div>
+                        
+                        <div class="tele-card">
+                            <div class="tele-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <h3>Symptom Checker</h3>
+                            <p>AI-powered symptom analysis</p>
+                            <button class="btn btn-outline" onclick="openSymptomChecker()">Check Symptoms</button>
+                        </div>
+                        
+                        <div class="tele-card">
+                            <div class="tele-icon">
+                                <i class="fas fa-prescription-bottle"></i>
+                            </div>
+                            <h3>E-Prescription</h3>
+                            <p>Digital prescriptions and refills</p>
+                            <button class="btn btn-outline" onclick="viewPrescriptions()">View Prescriptions</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analytics-section" class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-bar"></i> Health Analytics</h2>
+                        <p>Track your health trends and insights</p>
+                    </div>
+                    
+                    <div class="analytics-grid">
+                        <div class="chart-card">
+                            <h3>Blood Pressure Trend</h3>
+                            <div class="chart-placeholder">
+                                <canvas id="bp-chart" width="300" height="150"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h3>Weight Progress</h3>
+                            <div class="chart-placeholder">
+                                <canvas id="weight-chart" width="300" height="150"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-card">
+                            <h3>Health Insights</h3>
+                            <div class="insight-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span>Blood pressure is within normal range</span>
+                            </div>
+                            <div class="insight-item">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                                <span>Consider increasing physical activity</span>
+                            </div>
+                            <div class="insight-item">
+                                <i class="fas fa-info-circle text-info"></i>
+                                <span>Next checkup due in 2 weeks</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pharmacy Section -->
+                <section id="pharmacy-section" class="dashboard-section">
+                    <div class="section-header">
+                        <div class="header-left">
+                            <h2><i class="fas fa-pills"></i> Pharmacy</h2>
+                            <p>Order medications and manage prescriptions</p>
+                        </div>
+                        <div class="pharmacy-actions">
+                            <button class="btn btn-outline" onclick="uploadPrescription()">
+                                <i class="fas fa-upload"></i> Upload Prescription
+                            </button>
+                            <button class="btn btn-primary" onclick="addPrescription()">
+                                <i class="fas fa-plus"></i> Add Prescription
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="pharmacy-filters">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-medication" placeholder="Search medications...">
+                        </div>
+                        <select id="category-filter" title="Filter medications by category">
+                            <option value="">All Categories</option>
+                            <option value="pain-relief">Pain Relief</option>
+                            <option value="antibiotics">Antibiotics</option>
+                            <option value="vitamins">Vitamins</option>
+                            <option value="chronic">Chronic Care</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="showNearbyPharmacies()">
+                            <i class="fas fa-map-marker-alt"></i> Nearby Pharmacies
+                        </button>
+                    </div>
+                    
+                    <div class="pharmacy-content">
+                        <div class="pharmacy-stats">
+                            <div class="stat-card">
+                                <i class="fas fa-shopping-cart"></i>
+                                <div class="stat-info">
+                                    <span class="stat-number">12</span>
+                                    <span class="stat-label">Total Orders</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-prescription"></i>
+                                <div class="stat-info">
+                                    <span class="stat-number">3</span>
+                                    <span class="stat-label">Active Prescriptions</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-truck"></i>
+                                <div class="stat-info">
+                                    <span class="stat-number">₵150</span>
+                                    <span class="stat-label">This Month</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pharmacy-grid">
+                            <div class="medication-card" data-category="pain-relief">
+                                <div class="med-badge">Popular</div>
+                                <div class="med-icon">
+                                    <i class="fas fa-capsules"></i>
+                                </div>
+                                <div class="med-info">
+                                    <h3>Paracetamol 500mg</h3>
+                                    <p class="med-description">Pain relief & fever reducer</p>
+                                    <p class="med-price">₵15.00 <span class="med-unit">per pack</span></p>
+                                    <p class="med-stock in-stock"><i class="fas fa-check-circle"></i> In Stock (50+ available)</p>
+                                    <div class="med-rating">
+                                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                                        <span class="rating-text">4.8 (124 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="med-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewMedication('Paracetamol')">Details</button>
+                                    <button class="btn btn-primary btn-sm" onclick="orderMedication('Paracetamol', 15)">Add to Cart</button>
+                                </div>
+                            </div>
+                            
+                            <div class="medication-card" data-category="pain-relief">
+                                <div class="med-icon">
+                                    <i class="fas fa-tablets"></i>
+                                </div>
+                                <div class="med-info">
+                                    <h3>Ibuprofen 400mg</h3>
+                                    <p class="med-description">Anti-inflammatory pain relief</p>
+                                    <p class="med-price">₵25.00 <span class="med-unit">per pack</span></p>
+                                    <p class="med-stock in-stock"><i class="fas fa-check-circle"></i> In Stock (30+ available)</p>
+                                    <div class="med-rating">
+                                        <span class="stars">⭐⭐⭐⭐</span>
+                                        <span class="rating-text">4.6 (89 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="med-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewMedication('Ibuprofen')">Details</button>
+                                    <button class="btn btn-primary btn-sm" onclick="orderMedication('Ibuprofen', 25)">Add to Cart</button>
+                                </div>
+                            </div>
+                            
+                            <div class="medication-card" data-category="antibiotics">
+                                <div class="med-badge prescription">Prescription Required</div>
+                                <div class="med-icon">
+                                    <i class="fas fa-prescription-bottle"></i>
+                                </div>
+                                <div class="med-info">
+                                    <h3>Amoxicillin 250mg</h3>
+                                    <p class="med-description">Antibiotic for bacterial infections</p>
+                                    <p class="med-price">₵45.00 <span class="med-unit">per course</span></p>
+                                    <p class="med-stock low-stock"><i class="fas fa-exclamation-triangle"></i> Low Stock (5 remaining)</p>
+                                    <div class="med-rating">
+                                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                                        <span class="rating-text">4.9 (67 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="med-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewMedication('Amoxicillin')">Details</button>
+                                    <button class="btn btn-primary btn-sm" onclick="orderMedication('Amoxicillin', 45)">Add to Cart</button>
+                                </div>
+                            </div>
+                            
+                            <div class="medication-card" data-category="vitamins">
+                                <div class="med-icon">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <div class="med-info">
+                                    <h3>Vitamin C 1000mg</h3>
+                                    <p class="med-description">Immune system support</p>
+                                    <p class="med-price">₵35.00 <span class="med-unit">per bottle</span></p>
+                                    <p class="med-stock in-stock"><i class="fas fa-check-circle"></i> In Stock (100+ available)</p>
+                                    <div class="med-rating">
+                                        <span class="stars">⭐⭐⭐⭐</span>
+                                        <span class="rating-text">4.5 (156 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="med-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewMedication('Vitamin C')">Details</button>
+                                    <button class="btn btn-primary btn-sm" onclick="orderMedication('Vitamin C', 35)">Add to Cart</button>
+                                </div>
+                            </div>
+                            
+                            <div class="medication-card" data-category="chronic">
+                                <div class="med-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="med-info">
+                                    <h3>Metformin 500mg</h3>
+                                    <p class="med-description">Diabetes management</p>
+                                    <p class="med-price">₵55.00 <span class="med-unit">per month</span></p>
+                                    <p class="med-stock in-stock"><i class="fas fa-check-circle"></i> In Stock (25+ available)</p>
+                                    <div class="med-rating">
+                                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                                        <span class="rating-text">4.7 (203 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="med-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewMedication('Metformin')">Details</button>
+                                    <button class="btn btn-primary btn-sm" onclick="orderMedication('Metformin', 55)">Add to Cart</button>
+                                </div>
+                            </div>
+                            
+                            <div class="medication-card" data-category="vitamins">
+                                <div class="med-icon">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div class="med-info">
+                                    <h3>Multivitamin Complex</h3>
+                                    <p class="med-description">Daily nutritional support</p>
+                                    <p class="med-price">₵65.00 <span class="med-unit">per bottle</span></p>
+                                    <p class="med-stock in-stock"><i class="fas fa-check-circle"></i> In Stock (40+ available)</p>
+                                    <div class="med-rating">
+                                        <span class="stars">⭐⭐⭐⭐</span>
+                                        <span class="rating-text">4.4 (98 reviews)</span>
+                                    </div>
+                                </div>
+                                <div class="med-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewMedication('Multivitamin')">Details</button>
+                                    <button class="btn btn-primary btn-sm" onclick="orderMedication('Multivitamin', 65)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pharmacy-bottom">
+                            <div class="prescription-history">
+                                <h3><i class="fas fa-history"></i> Recent Orders</h3>
+                                <div class="order-list">
+                                    <div class="order-item">
+                                        <div class="order-info">
+                                            <h4>Paracetamol 500mg</h4>
+                                            <p>Order #GH001234 • Jan 10, 2024</p>
+                                            <span class="order-status delivered">Delivered</span>
+                                        </div>
+                                        <div class="order-details">
+                                            <div class="order-price">₵15.00</div>
+                                            <button class="btn btn-outline btn-xs" onclick="trackOrder('GH001234')">Track</button>
+                                        </div>
+                                    </div>
+                                    <div class="order-item">
+                                        <div class="order-info">
+                                            <h4>Vitamin C 1000mg</h4>
+                                            <p>Order #GH001235 • Jan 8, 2024</p>
+                                            <span class="order-status processing">Processing</span>
+                                        </div>
+                                        <div class="order-details">
+                                            <div class="order-price">₵35.00</div>
+                                            <button class="btn btn-outline btn-xs" onclick="trackOrder('GH001235')">Track</button>
+                                        </div>
+                                    </div>
+                                    <div class="order-item">
+                                        <div class="order-info">
+                                            <h4>Ibuprofen 400mg</h4>
+                                            <p>Order #GH001236 • Jan 5, 2024</p>
+                                            <span class="order-status shipped">Shipped</span>
+                                        </div>
+                                        <div class="order-details">
+                                            <div class="order-price">₵25.00</div>
+                                            <button class="btn btn-outline btn-xs" onclick="trackOrder('GH001236')">Track</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="delivery-info">
+                                <h3><i class="fas fa-truck"></i> Delivery Information</h3>
+                                <div class="delivery-options">
+                                    <div class="delivery-option">
+                                        <i class="fas fa-clock"></i>
+                                        <div>
+                                            <h4>Standard Delivery</h4>
+                                            <p>2-3 business days • FREE for orders over ₵50</p>
+                                        </div>
+                                    </div>
+                                    <div class="delivery-option">
+                                        <i class="fas fa-bolt"></i>
+                                        <div>
+                                            <h4>Express Delivery</h4>
+                                            <p>Same day delivery • ₵10 delivery fee</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -457,7 +2515,7 @@
                     <div class="profile-content">
                         <div class="profile-header">
                             <div class="profile-avatar">
-                                <img src="public/placeholder-user.jpg" alt="Profile Picture">
+                                <img src="Pictures/portrait-african-american-woman-working-as-doctor.jpg" alt="Profile Picture">
                                 <button class="avatar-edit">
                                     <i class="fas fa-camera"></i>
                                 </button>
@@ -512,14 +2570,58 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Edit Profile</h3>
-                <button class="modal-close" id="close-profile-modal">
+                <button class="modal-close" id="close-profile-modal" title="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label for="profile-name-input">Full Name</label>
-                    <input type="text" id="profile-name-input" value="Kwame Asante">
+                    <input type="text" id="profile-name-input" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="profile-phone-input">Phone Number</label>
+                    <input type="tel" id="profile-phone-input" placeholder="+233 XX XXX XXXX">
+                </div>
+                <div class="form-group">
+                    <label for="profile-age-input">Age</label>
+                    <input type="number" id="profile-age-input" placeholder="Enter your age" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label for="profile-location-input">Location</label>
+                    <select id="profile-location-input">
+                        <option value="">Select your city</option>
+                        <option value="Accra">Accra</option>
+                        <option value="Kumasi">Kumasi</option>
+                        <option value="Takoradi">Takoradi</option>
+                        <option value="Tamale">Tamale</option>
+                        <option value="Cape Coast">Cape Coast</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profile-gender-input">Gender</label>
+                    <select id="profile-gender-input">
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profile-blood-input">Blood Type</label>
+                    <select id="profile-blood-input">
+                        <option value="">Select blood type (optional)</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="profile-pic-input">Profile Picture</label>
@@ -538,7 +2640,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="booking-doctor-name">Book Appointment</h3>
-                <button class="modal-close" id="close-booking-modal">
+                <button class="modal-close" id="close-booking-modal" title="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -573,11 +2675,336 @@
         </div>
     </div>
 
+    <!-- Health Record Modal -->
+    <div class="modal hidden" id="health-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="health-modal-title">Add Health Record</h3>
+                <button class="modal-close" id="close-health-modal" title="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="health-record-form">
+                    <div class="form-group">
+                        <label for="record-type">Record Type</label>
+                        <select id="record-type" name="record-type" required>
+                            <option value="">Select type</option>
+                            <option value="medical-history">Medical History</option>
+                            <option value="allergy">Allergy</option>
+                            <option value="medication">Medication</option>
+                            <option value="lab-result">Lab Result</option>
+                            <option value="vaccination">Vaccination</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="record-title">Title</label>
+                        <input type="text" id="record-title" name="record-title" placeholder="e.g., Blood Test Results" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="record-date">Date</label>
+                        <input type="date" id="record-date" name="record-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="record-description">Description</label>
+                        <textarea id="record-description" name="record-description" placeholder="Detailed description or notes" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="record-file">Attach File (Optional)</label>
+                        <input type="file" id="record-file" name="record-file" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="close-health-record" class="btn btn-outline">Cancel</button>
+                <button type="button" id="save-health-record" class="btn btn-primary">Save Record</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Symptom Checker Modal -->
+    <div class="modal hidden" id="symptom-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Symptom Checker</h3>
+                <button class="modal-close" id="close-symptom-modal" title="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="symptom-checker">
+                    <h4>Select your symptoms:</h4>
+                    <div class="symptom-grid">
+                        <label class="symptom-item">
+                            <input type="checkbox" name="symptoms" value="fever">
+                            <span><i class="fas fa-thermometer-half"></i> Fever</span>
+                        </label>
+                        <label class="symptom-item">
+                            <input type="checkbox" name="symptoms" value="headache">
+                            <span><i class="fas fa-head-side-cough"></i> Headache</span>
+                        </label>
+                        <label class="symptom-item">
+                            <input type="checkbox" name="symptoms" value="cough">
+                            <span><i class="fas fa-lungs"></i> Cough</span>
+                        </label>
+                        <label class="symptom-item">
+                            <input type="checkbox" name="symptoms" value="fatigue">
+                            <span><i class="fas fa-tired"></i> Fatigue</span>
+                        </label>
+                        <label class="symptom-item">
+                            <input type="checkbox" name="symptoms" value="nausea">
+                            <span><i class="fas fa-dizzy"></i> Nausea</span>
+                        </label>
+                        <label class="symptom-item">
+                            <input type="checkbox" name="symptoms" value="chest-pain">
+                            <span><i class="fas fa-heart"></i> Chest Pain</span>
+                        </label>
+                    </div>
+                    <div id="symptom-results" class="symptom-results hidden">
+                        <h4>Possible Conditions:</h4>
+                        <div class="condition-list"></div>
+                        <p class="disclaimer">⚠️ This is not a medical diagnosis. Please consult a healthcare professional.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="analyze-symptoms" class="btn btn-primary">Analyze Symptoms</button>
+                <button type="button" id="book-consultation" class="btn btn-outline">Book Consultation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Call Modal -->
+    <div class="modal hidden" id="voice-call-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-phone"></i> Voice Call</h3>
+                <button class="modal-close" onclick="closeVoiceCall()" title="Close call">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="call-interface">
+                    <div class="call-status">
+                        <div class="doctor-avatar">
+                            <img src="Pictures/cheerful-ethnic-doctor-with-arms-crossed.jpg" alt="Doctor">
+                        </div>
+                        <h4>Dr. Akosua Darko</h4>
+                        <p class="call-state">Connecting...</p>
+                        <div class="call-timer">00:00</div>
+                    </div>
+                    <div class="call-controls">
+                        <button class="call-btn mute-btn" onclick="toggleMute()">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="call-btn end-btn" onclick="endCall()">
+                            <i class="fas fa-phone-slash"></i>
+                        </button>
+                        <button class="call-btn speaker-btn" onclick="toggleSpeaker()">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- E-Prescription Modal -->
+    <div class="modal hidden" id="prescription-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-prescription-bottle"></i> E-Prescription</h3>
+                <button class="modal-close" onclick="closePrescription()" title="Close prescription">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="prescription-list">
+                    <div class="prescription-item">
+                        <div class="prescription-header">
+                            <h4>Dr. Kwame Osei - Cardiology</h4>
+                            <span class="prescription-date">Jan 15, 2024</span>
+                        </div>
+                        <div class="medication-list">
+                            <div class="medication-item">
+                                <strong>Metformin 500mg</strong>
+                                <p>Take 1 tablet twice daily with meals</p>
+                                <span class="refills">Refills: 2 remaining</span>
+                            </div>
+                            <div class="medication-item">
+                                <strong>Lisinopril 10mg</strong>
+                                <p>Take 1 tablet once daily in the morning</p>
+                                <span class="refills">Refills: 1 remaining</span>
+                            </div>
+                        </div>
+                        <div class="prescription-actions">
+                            <button class="btn btn-outline btn-sm" onclick="downloadPrescription()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="orderPrescription()">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prescription-item">
+                        <div class="prescription-header">
+                            <h4>Dr. Ama Asante - General Practice</h4>
+                            <span class="prescription-date">Jan 10, 2024</span>
+                        </div>
+                        <div class="medication-list">
+                            <div class="medication-item">
+                                <strong>Paracetamol 500mg</strong>
+                                <p>Take 1-2 tablets every 4-6 hours as needed</p>
+                                <span class="refills">No refills needed</span>
+                            </div>
+                        </div>
+                        <div class="prescription-actions">
+                            <button class="btn btn-outline btn-sm" onclick="downloadPrescription()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="orderPrescription()">
+                                <i class="fas fa-shopping-cart"></i> Order Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Symptom Checker Modal -->
+    <div class="modal hidden" id="symptom-checker-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-stethoscope"></i> AI Symptom Checker</h3>
+                <button class="modal-close" onclick="closeSymptomChecker()" title="Close symptom checker">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="symptom-checker-steps">
+                    <div class="step active" id="step-1">
+                        <h4>Step 1: Select Your Symptoms</h4>
+                        <div class="symptom-categories">
+                            <div class="category-group">
+                                <h5><i class="fas fa-head-side-cough"></i> Head & Neck</h5>
+                                <div class="symptom-options">
+                                    <label><input type="checkbox" name="symptoms" value="headache"> Headache</label>
+                                    <label><input type="checkbox" name="symptoms" value="sore-throat"> Sore Throat</label>
+                                    <label><input type="checkbox" name="symptoms" value="runny-nose"> Runny Nose</label>
+                                </div>
+                            </div>
+                            <div class="category-group">
+                                <h5><i class="fas fa-lungs"></i> Respiratory</h5>
+                                <div class="symptom-options">
+                                    <label><input type="checkbox" name="symptoms" value="cough"> Cough</label>
+                                    <label><input type="checkbox" name="symptoms" value="shortness-breath"> Shortness of Breath</label>
+                                    <label><input type="checkbox" name="symptoms" value="chest-pain"> Chest Pain</label>
+                                </div>
+                            </div>
+                            <div class="category-group">
+                                <h5><i class="fas fa-thermometer-half"></i> General</h5>
+                                <div class="symptom-options">
+                                    <label><input type="checkbox" name="symptoms" value="fever"> Fever</label>
+                                    <label><input type="checkbox" name="symptoms" value="fatigue"> Fatigue</label>
+                                    <label><input type="checkbox" name="symptoms" value="nausea"> Nausea</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="nextStep(2)">Next Step</button>
+                    </div>
+                    
+                    <div class="step" id="step-2">
+                        <h4>Step 2: Symptom Duration</h4>
+                        <div class="duration-options">
+                            <label><input type="radio" name="duration" value="hours"> Less than 24 hours</label>
+                            <label><input type="radio" name="duration" value="days"> 1-7 days</label>
+                            <label><input type="radio" name="duration" value="weeks"> 1-4 weeks</label>
+                            <label><input type="radio" name="duration" value="months"> More than a month</label>
+                        </div>
+                        <div class="step-actions">
+                            <button class="btn btn-outline" onclick="prevStep(1)">Previous</button>
+                            <button class="btn btn-primary" onclick="analyzeSymptoms()">Analyze</button>
+                        </div>
+                    </div>
+                    
+                    <div class="step" id="step-3">
+                        <h4>Analysis Results</h4>
+                        <div class="analysis-results">
+                            <div class="result-item">
+                                <div class="condition-probability high">
+                                    <span class="probability">85%</span>
+                                    <div class="condition-info">
+                                        <h5>Common Cold</h5>
+                                        <p>Based on your symptoms, this appears to be a common viral infection.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="result-item">
+                                <div class="condition-probability medium">
+                                    <span class="probability">60%</span>
+                                    <div class="condition-info">
+                                        <h5>Seasonal Allergies</h5>
+                                        <p>Your symptoms could indicate an allergic reaction.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="recommendations">
+                            <h5>Recommendations:</h5>
+                            <ul>
+                                <li>Get plenty of rest</li>
+                                <li>Stay hydrated</li>
+                                <li>Consider over-the-counter pain relief</li>
+                            </ul>
+                        </div>
+                        <div class="disclaimer">
+                            <p><strong>⚠️ Important:</strong> This is not a medical diagnosis. Please consult a healthcare professional for proper evaluation.</p>
+                        </div>
+                        <div class="step-actions">
+                            <button class="btn btn-outline" onclick="restartChecker()">Start Over</button>
+                            <button class="btn btn-primary" onclick="bookConsultation()">Book Consultation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-items">
+            <a href="#" class="mobile-nav-item active" data-route="overview">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-route="appointments">
+                <i class="fas fa-calendar"></i>
+                <span>Appointments</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-route="doctors">
+                <i class="fas fa-user-md"></i>
+                <span>Doctors</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-route="chat">
+                <i class="fas fa-comments"></i>
+                <span>Messages</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-route="pharmacy">
+                <i class="fas fa-pills"></i>
+                <span>Pharmacy</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-route="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
     <!-- Scripts -->
     <script src="js/app-config.js"></script>
-    <script type="module" src="js/firebase-config.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
     <script src="js/weather-api.js"></script>
 </body>
 </html>

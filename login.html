@@ -11,7 +11,7 @@
 <body>
     <div class="auth-container">
         <!-- Background Pattern -->
-        <div class="auth-background">
+        <div class="auth-background" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('Pictures/medical-banner-with-doctor-wearing-goggles.jpg'); background-size: cover; background-position: center;">
             <div class="pattern-circle circle-1"></div>
             <div class="pattern-circle circle-2"></div>
             <div class="pattern-circle circle-3"></div>
@@ -21,6 +21,10 @@
         <div class="auth-content">
             <!-- Header -->
             <header class="auth-header">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Home
+                </a>
                 <div class="brand">
                     <div class="logo">
                         <i class="fas fa-heart"></i>
@@ -151,7 +155,6 @@
     </div>
 
     <!-- Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
     <script src="js/main.js"></script>
     <script type="module" src="js/login.js"></script>
 </body>

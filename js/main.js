@@ -21,16 +21,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Smooth scrolling for anchor links
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
     anchorLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+            const href = this.getAttribute('href');
+            if (href && href !== '#') {
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         });
     });
@@ -192,3 +195,103 @@ window.addEventListener('error', function(e) {
 
 // Export utils for use in other scripts
 window.utils = utils;
+
+// ===========================
+// POLICY POPUPS
+// ===========================
+function showTermsAndConditions() {
+    const content = `
+<h3>Terms & Conditions</h3>
+<div style="max-height: 400px; overflow-y: auto; text-align: left;">
+<h4>1. Acceptance of Terms</h4>
+<p>By using GhanaHealth+, you agree to these terms and conditions.</p>
+
+<h4>2. Medical Disclaimer</h4>
+<p>Our platform provides health information and connects you with healthcare providers. It does not replace professional medical advice.</p>
+
+<h4>3. User Responsibilities</h4>
+<p>• Provide accurate health information<br>
+• Respect healthcare providers<br>
+• Pay for services as agreed</p>
+
+<h4>4. Privacy & Data</h4>
+<p>We protect your health data according to Ghana's Data Protection Act and international standards.</p>
+
+<h4>5. Service Availability</h4>
+<p>We strive for 24/7 availability but cannot guarantee uninterrupted service.</p>
+
+<h4>6. Limitation of Liability</h4>
+<p>GhanaHealth+ is not liable for medical outcomes. Always seek emergency care when needed.</p>
+</div>
+    `;
+    showPolicyPopup('Terms & Conditions', content);
+}
+
+function showPrivacyPolicy() {
+    const content = `
+<h3>Privacy Policy</h3>
+<div style="max-height: 400px; overflow-y: auto; text-align: left;">
+<h4>Information We Collect</h4>
+<p>• Personal details (name, contact info)<br>
+• Health information you provide<br>
+• Usage data and preferences</p>
+
+<h4>How We Use Your Data</h4>
+<p>• Provide healthcare services<br>
+• Connect you with doctors<br>
+• Improve our platform<br>
+• Send important notifications</p>
+
+<h4>Data Protection</h4>
+<p>• Encrypted data transmission<br>
+• Secure servers in Ghana<br>
+• Limited access to authorized personnel<br>
+• Regular security audits</p>
+
+<h4>Your Rights</h4>
+<p>• Access your data<br>
+• Request corrections<br>
+• Delete your account<br>
+• Data portability</p>
+
+<h4>Contact</h4>
+<p>For privacy concerns: privacy@ghanahealthplus.com</p>
+</div>
+    `;
+    showPolicyPopup('Privacy Policy', content);
+}
+
+function showPolicyPopup(title, content) {
+    const popup = document.createElement('div');
+    popup.className = 'policy-popup-overlay';
+    popup.innerHTML = `
+        <div class="policy-popup">
+            <div class="policy-header">
+                <h2>${title}</h2>
+                <button class="close-btn" onclick="closePolicyPopup()">&times;</button>
+            </div>
+            <div class="policy-content">
+                ${content}
+            </div>
+            <div class="policy-footer">
+                <button class="btn btn-primary" onclick="closePolicyPopup()">I Understand</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(popup);
+    document.body.style.overflow = 'hidden';
+}
+
+function closePolicyPopup() {
+    const popup = document.querySelector('.policy-popup-overlay');
+    if (popup) {
+        popup.remove();
+        document.body.style.overflow = '';
+    }
+}
+
+// Global functions
+window.showTermsAndConditions = showTermsAndConditions;
+window.showPrivacyPolicy = showPrivacyPolicy;
+window.closePolicyPopup = closePolicyPopup;
