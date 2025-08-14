@@ -39,6 +39,7 @@
     z-index: 1000;
     transition: transform 0.3s ease;
     box-shadow: 4px 0 20px rgba(0, 102, 204, 0.08);
+    overflow-y: auto;
 }
 
 .sidebar-header {

@@ -59,6 +59,7 @@
                             id="email" 
                             name="email" 
                             placeholder="Enter your email address"
+                            autocomplete="email"
                             required
                         >
                         <div class="input-icon">
@@ -78,6 +79,7 @@
                                 id="password" 
                                 name="password" 
                                 placeholder="Enter your password"
+                                autocomplete="current-password"
                                 required
                             >
                             <button type="button" class="password-toggle" id="passwordToggle">
@@ -112,6 +114,11 @@
                 </form>
 
                 <!-- Patient-only: social login removed intentionally -->
+
+                <!-- Debug Button (Development Only) -->
+                <div style="text-align: center; margin: 1rem 0;">
+                    <button type="button" onclick="localStorage.clear(); alert('Data cleared')" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px;">Clear Data</button>
+                </div>
 
                 <!-- Sign Up Link -->
                 <div class="auth-footer">
@@ -156,6 +163,7 @@
 
     <!-- Scripts -->
     <script src="js/main.js"></script>
+    <script src="js/auth-debug.js"></script>
     <script type="module" src="js/login.js"></script>
 </body>
 </html>
