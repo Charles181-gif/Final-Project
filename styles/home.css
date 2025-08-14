@@ -63,7 +63,6 @@
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #e8f8f5 0%, var(--white) 100%);
     padding: 4rem 0;
 }
 
@@ -240,6 +239,11 @@
     margin-bottom: 1.5rem;
 }
 
+.service-card .btn {
+    margin-top: 1rem;
+    width: 100%;
+}
+
 .service-price {
     background-color: var(--gray-100);
     color: var(--primary-color);
@@ -414,6 +418,112 @@
 
 .dot.active {
     background-color: var(--white);
+}
+
+/* Health Metrics Preview Section */
+.health-preview {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #f8fbff 0%, #e6f3ff 100%);
+}
+
+.metrics-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid rgba(0, 102, 204, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 102, 204, 0.2);
+    border-color: #0066cc;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #0066cc 0%, #00a86b 100%);
+}
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0066cc 0%, #00a86b 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.metric-icon i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.metric-content h3 {
+    font-size: 1.125rem;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0066cc, #00a86b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+    font-family: 'Inter', monospace;
+}
+
+.metric-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.metric-status.normal {
+    color: #38a169;
+}
+
+.metric-status.warning {
+    color: #ed8936;
+}
+
+.metric-status.critical {
+    color: #e53e3e;
+}
+
+.metric-status i {
+    font-size: 1rem;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
 }
 
 /* CTA Section */
@@ -758,6 +868,16 @@
         flex-direction: column;
         align-items: stretch;
     }
+    
+    .metrics-preview {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .preview-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 @media (max-width: 480px) {
@@ -785,4 +905,56 @@
     .testimonial blockquote {
         font-size: 1rem;
     }
+    
+    .metrics-preview {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .metric-card {
+        padding: 1.5rem;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+}
+/* Fix for invisible metric values */
+.metric-value {
+    color: #0066cc !important;
+    font-weight: 700 !important;
+    font-size: 28px !important;
+    font-family: 'Inter', monospace !important;
+    -webkit-text-fill-color: #0066cc !important;
+    background: none !important;
+}
+
+.metric-content h3 {
+    color: #718096 !important;
+}
+
+.metric-status.normal {
+    color: #38a169 !important;
+}
+
+.metric-status.stable {
+    color: #ed8936 !important;
+}
+
+.metric-trend.up {
+    color: #38a169 !important;
+}
+
+.metric-trend.down {
+    color: #e53e3e !important;
+}
+
+.metric-trend.stable {
+    color: #718096 !important;
+}
+
+.section-header h2 {
+    color: #0066cc !important;
+    -webkit-text-fill-color: #0066cc !important;
+    background: none !important;
 }

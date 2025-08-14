@@ -113,11 +113,8 @@ function initLoginForm() {
 
       window.utils.showSuccess('Login successful! Redirecting to dashboard...');
       setTimeout(() => {
-        // Always redirect to profile setup first, then dashboard
-        setTimeout(() => {
-          window.location.href = 'profile-setup.html';
-        }, 800);
-      }, 800);
+        window.location.href = 'profile-setup.html';
+      }, 1500);
     } catch (error) {
       console.error('Login error:', error);
       let errorMessage = 'Login failed. Please check your credentials.';

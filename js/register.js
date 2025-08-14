@@ -34,14 +34,16 @@ function initPasswordToggles() {
 
 function initRegistrationForm() {
   const form = document.getElementById('registerForm');
+  if (!form) return;
+  
   const submitButton = form.querySelector('button[type="submit"]');
   const errorEl = document.getElementById('errorMessage');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    hideError(errorEl);
-    showLoading(submitButton);
+    window.utils.hideError('errorMessage');
+    window.utils.showLoading(submitButton);
 
     try {
       const formData = new FormData(form);
@@ -53,19 +55,29 @@ function initRegistrationForm() {
 
       // Basic validations
       if (!name || !email || !password || !confirmPassword) {
-        return showFail('Please fill in all required fields.', submitButton, errorEl);
+        window.utils.showError('errorMessage', 'Please fill in all required fields.');
+        window.utils.hideLoading(submitButton);
+        return;
       }
-      if (!validateEmail(email)) {
-        return showFail('Please enter a valid email address.', submitButton, errorEl);
+      if (!window.utils.validateEmail(email)) {
+        window.utils.showError('errorMessage', 'Please enter a valid email address.');
+        window.utils.hideLoading(submitButton);
+        return;
       }
-      if (password.length < 10) {
-        return showFail('Password must be at least 10 characters long.', submitButton, errorEl);
+      if (password.length < 6) {
+        window.utils.showError('errorMessage', 'Password must be at least 6 characters long.');
+        window.utils.hideLoading(submitButton);
+        return;
       }
       if (password !== confirmPassword) {
-        return showFail('Passwords do not match.', submitButton, errorEl);
+        window.utils.showError('errorMessage', 'Passwords do not match.');
+        window.utils.hideLoading(submitButton);
+        return;
       }
       if (!terms) {
-        return showFail('You must agree to the Terms & Conditions.', submitButton, errorEl);
+        window.utils.showError('errorMessage', 'You must agree to the Terms & Conditions.');
+        window.utils.hideLoading(submitButton);
+        return;
       }
 
       try {
@@ -73,7 +85,7 @@ function initRegistrationForm() {
         console.log('Using fallback authentication system');
         const fallbackResult = await authFallback.signUp(email, password, { full_name: name });
         
-        showSuccess('Account created successfully! Redirecting to login...');
+        window.utils.showSuccess('Account created successfully! Redirecting to login...');
         form.reset();
         
         setTimeout(() => {
@@ -115,7 +127,7 @@ function initRegistrationForm() {
           }
         }
         
-        showSuccess('Account created successfully! Redirecting to login...');
+        window.utils.showSuccess('Account created successfully! Redirecting to login...');
         form.reset();
         
         setTimeout(() => {
@@ -132,80 +144,107 @@ function initRegistrationForm() {
       if (error?.message?.includes('Password should be')) message = 'Password is too weak.';
       if (error?.message?.includes('Invalid email')) message = 'Invalid email address.';
       if (error?.message?.includes('captcha')) message = 'Registration temporarily unavailable. Please try again later.';
-      showError(errorEl, message);
+      window.utils.showError('errorMessage', message);
     } finally {
-      hideLoading(submitButton);
+      window.utils.hideLoading(submitButton);
     }
   });
 }
 
-// Helpers
-function validateEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
+// Terms and conditions popup
+window.showTermsAndConditions = function() {
+  const content = `
+<h3>Terms & Conditions</h3>
+<div style="max-height: 400px; overflow-y: auto; text-align: left;">
+<h4>1. Acceptance of Terms</h4>
+<p>By using GhanaHealth+, you agree to these terms and conditions.</p>
 
-function showLoading(button) {
-  if (!button) return;
-  button.classList.add('loading');
-  button.disabled = true;
-  const btnText = button.querySelector('.btn-text');
-  const btnLoading = button.querySelector('.btn-loading');
-  if (btnText) btnText.style.display = 'none';
-  if (btnLoading) btnLoading.style.display = 'inline-flex';
-}
+<h4>2. Medical Disclaimer</h4>
+<p>Our platform provides health information and connects you with healthcare providers. It does not replace professional medical advice.</p>
 
-function hideLoading(button) {
-  if (!button) return;
-  button.classList.remove('loading');
-  button.disabled = false;
-  const btnText = button.querySelector('.btn-text');
-  const btnLoading = button.querySelector('.btn-loading');
-  if (btnText) btnText.style.display = 'inline';
-  if (btnLoading) btnLoading.style.display = 'none';
-}
+<h4>3. User Responsibilities</h4>
+<p>• Provide accurate health information<br>
+• Respect healthcare providers<br>
+• Pay for services as agreed</p>
 
-function showError(el, message) {
-  if (!el) return;
-  el.textContent = message;
-  el.style.display = 'block';
-}
+<h4>4. Privacy & Data</h4>
+<p>We protect your health data according to Ghana's Data Protection Act and international standards.</p>
 
-function hideError(el) {
-  if (!el) return;
-  el.style.display = 'none';
-}
+<h4>5. Service Availability</h4>
+<p>We strive for 24/7 availability but cannot guarantee uninterrupted service.</p>
 
-function showFail(message, button, errorEl) {
-  showError(errorEl, message);
-  hideLoading(button);
-  return false;
-}
-
-function showSuccess(message) {
-  // Create success notification
-  const successDiv = document.createElement('div');
-  successDiv.className = 'success-message';
-  successDiv.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #28a745;
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
-    max-width: 300px;
+<h4>6. Limitation of Liability</h4>
+<p>GhanaHealth+ is not liable for medical outcomes. Always seek emergency care when needed.</p>
+</div>
   `;
-  successDiv.textContent = message;
+  showPolicyPopup('Terms & Conditions', content);
+};
+
+function showPolicyPopup(title, content) {
+  const popup = document.createElement('div');
+  popup.className = 'policy-popup-overlay';
+  popup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  `;
   
-  document.body.appendChild(successDiv);
+  popup.innerHTML = `
+    <div class="policy-popup" style="
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    ">
+      <div class="policy-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin: 0;">${title}</h2>
+        <button class="close-btn" onclick="closePolicyPopup()" style="
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          padding: 0;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">&times;</button>
+      </div>
+      <div class="policy-content">
+        ${content}
+      </div>
+      <div class="policy-footer" style="margin-top: 1rem; text-align: center;">
+        <button class="btn btn-primary" onclick="closePolicyPopup()" style="
+          background: #2da44e;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+        ">I Understand</button>
+      </div>
+    </div>
+  `;
   
-  // Auto remove after 5 seconds
-  setTimeout(() => {
-    if (successDiv.parentNode) {
-      successDiv.parentNode.removeChild(successDiv);
-    }
-  }, 5000);
+  document.body.appendChild(popup);
+  document.body.style.overflow = 'hidden';
 }
+
+window.closePolicyPopup = function() {
+  const popup = document.querySelector('.policy-popup-overlay');
+  if (popup) {
+    popup.remove();
+    document.body.style.overflow = '';
+  }
+};

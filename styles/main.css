@@ -31,7 +31,7 @@ body {
     --text-light: #f8fbff;           /* Clean white-blue */
     --grey-light: #f7fafc;           /* Light background */
     --grey-dark: #718096;            /* Professional gray */
-    --success: #38a169;              /* Health green */
+    --success: #e4e4e4;              /* Health green */
     --warning: #ed8936;              /* Caution orange */
     --error: #e53e3e;                /* Alert red */
     --border: #e2e8f0;               /* Border color */
@@ -116,7 +116,7 @@ body {
 }
 .nav-brand .logo i {
     font-size: 1.8rem;
-    color: var(--primary);
+    color: #28a745;
 }
 .brand-text {
     margin-left: 0.5rem;
