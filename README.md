@@ -6,6 +6,19 @@
 
 ### 🎯 Mission
 *"Apomuden ma obiara"* - Quality, affordable healthcare for every Ghanaian.
+Enables Farmers to know the weather forecast
+Enable farmers to log their harvest
+Enable farmers to log their expense
+They can add task task (The task sends a notification to alert the farmers)
+Farmers can know the current market prices of various crops
+Gives Tips about livestock
+Gives Tips about crops
+Gives reports about the Net Profit and the Total Expense calculated for a year/month/week
+Can see recent activities
+Eliminates the use of books
+Shows a chart for profit trends
+ 
+
 
 ## 🚀 Features
 
