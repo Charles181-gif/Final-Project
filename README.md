@@ -12,7 +12,7 @@
 
 ## 1. Project Overview
 
-**GhanaHealth+** is a comprehensive healthcare platform designed specifically for Ghanaians, providing accessible, affordable, and quality healthcare services. The platform connects patients with certified healthcare providers, enables appointment booking, health tracking, and emergency services.
+**GhanaHealth+** is a comprehensive healthcare platform designed specifically for Ghanaians, providing accessible,pharmacy, affordable, and quality healthcare services. The platform connects patients with certified healthcare providers, enables appointment booking, health tracking, and emergency services.
 
 ### Mission Statement
 *"Apomuden ma obiara"* - Quality, affordable healthcare for every Ghanaian.
