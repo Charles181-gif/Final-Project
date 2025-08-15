@@ -135,7 +135,7 @@ body {
 .nav-menu {
     position: fixed;
     top: 0;
-    right: -250px; /* Hidden offscreen initially */
+    right: -250px; 
     width: 250px;
     height: 100vh;
     background-color: var(--background-color);
@@ -347,7 +347,7 @@ body {
         rgba(176, 193, 211, 0.8),
         rgba(0, 123, 255, 0.8)
     ),
-    url("../Pictures/front-view-doctor-wearing-white-coat.jpg") center/cover no-repeat;
+    url("../Pictures/nurse-measuring-patient-blood-pressure.jpg") center/cover no-repeat;
     color: white;
     text-align: center;
 }
@@ -358,7 +358,7 @@ body {
 
 /* Hero section for About page */
 .about-hero {
-    background: url('../Pictures/doctor-nurse-helping-wheelchair-user.jpg') center/cover no-repeat;
+    background: url('../Pictures/nurse-measuring-patient-blood-pressure.jpg') center/cover no-repeat;
     padding: 5rem 0;
     text-align: center;
     color: var(--text-light);
@@ -760,7 +760,7 @@ img.enhanced-img:hover {
             rgba(255, 255, 255, 0.85),
             rgba(255, 255, 255, 0.85)
         ),
-        url("../Pictures/nurse-preparing-their-shift.jpg") center/cover no-repeat;
+        url("../Pictures/portrait-young-female-doctor-scrubs-protective-face-mask-preparing-anesthesia-machine-before-operation\ \(1\).jpg") center/cover no-repeat;
     padding: 4rem 2rem;
 }
 
@@ -915,8 +915,8 @@ img.enhanced-img:hover {
 
 /* Hero Background Images */
 .hero-bg-1 { background-image: url('../Pictures/nurse-measuring-patient-blood-pressure.jpg'); }
-.hero-bg-2 { background-image: url('../Pictures/medical-banner-with-doctor-wearing-goggles.jpg'); }
-.hero-bg-3 { background-image: url('../Pictures/medicine-uniform-healthcare-medical-workers-day-concept.jpg'); }
+.hero-bg-2 { background-image: url('../Pictures/blur-hospital.jpg'); }
+.hero-bg-3 { background-image: url('../Pictures/retired-woman-patient-with-protection-face-mask-signing-medical-documents-medical-appointment-hospital-office-therapist-nurse-explaining-sickness-diagnosis-discussing-medication-treatment.jpg'); }
 
 /* Service Card Images */
 .service-img-1 { background-image: url('../Pictures/front-view-doctor-wearing-white-coat.jpg'); }

@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load user data
     function loadUserData() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const currentUser = JSON.parse(localStorage.getItem('ghanahealth_current_user') || '{}');
         
         const userData = {
             name: currentUser.full_name || "User",
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function openProfileModal() {
         profileModal.classList.remove('hidden');
         
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const currentUser = JSON.parse(localStorage.getItem('ghanahealth_current_user') || '{}');
         document.getElementById('profile-name-input').value = currentUser.full_name || '';
         document.getElementById('profile-age-input').value = currentUser.age || '';
         document.getElementById('profile-phone-input').value = currentUser.phone || '';
@@ -216,8 +216,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function saveProfile() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        const currentUser = JSON.parse(localStorage.getItem('ghanahealth_current_user') || '{}');
+        const users = JSON.parse(localStorage.getItem('ghanahealth_users') || '[]');
         
         const updatedData = {
             full_name: document.getElementById('profile-name-input').value.trim(),
@@ -243,11 +243,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateUserProfile(currentUser, users, updatedData) {
         const updatedUser = { ...currentUser, ...updatedData };
         
-        if (users[currentUser.email]) {
-            users[currentUser.email] = updatedUser;
-            localStorage.setItem('users', JSON.stringify(users));
+        // Update user in users array
+        const userIndex = users.findIndex(user => user.email === currentUser.email);
+        if (userIndex !== -1) {
+            users[userIndex] = updatedUser;
+            localStorage.setItem('ghanahealth_users', JSON.stringify(users));
         }
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        localStorage.setItem('ghanahealth_current_user', JSON.stringify(updatedUser));
         
         loadUserData();
         closeProfileModal();
@@ -499,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.logout = function() {
         if (confirm('Are you sure you want to logout?')) {
-            // In a real app, this would clear auth and redirect
+            localStorage.removeItem('ghanahealth_current_user');
             window.location.href = 'login.html';
         }
     };

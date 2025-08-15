@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Authentication</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    
+    <div class="test-section">
+        <h3>Current Status</h3>
+        <p id="auth-status">Checking...</p>
+        <button onclick="checkAuth()">Check Auth Status</button>
+        <button onclick="clearData()">Clear All Data</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Registration</h3>
+        <input type="email" id="reg-email" placeholder="Email" value="test@example.com">
+        <input type="password" id="reg-password" placeholder="Password" value="password123">
+        <input type="text" id="reg-name" placeholder="Full Name" value="Test User">
+        <button onclick="testRegister()">Test Register</button>
+        <p id="reg-result"></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Login</h3>
+        <input type="email" id="login-email" placeholder="Email" value="test@example.com">
+        <input type="password" id="login-password" placeholder="Password" value="password123">
+        <button onclick="testLogin()">Test Login</button>
+        <p id="login-result"></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Navigation</h3>
+        <a href="register.html">Go to Register</a> |
+        <a href="login.html">Go to Login</a> |
+        <a href="dashboard.html">Go to Dashboard</a>
+    </div>
+
+    <script type="module">
+        import { authFallback } from './js/auth-fallback.js';
+        
+        window.authFallback = authFallback;
+        
+        window.checkAuth = function() {
+            const users = JSON.parse(localStorage.getItem('ghanahealth_users') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('ghanahealth_current_user') || 'null');
+            
+            document.getElementById('auth-status').innerHTML = `
+                <strong>Users:</strong> ${users.length} registered<br>
+                <strong>Current User:</strong> ${currentUser ? currentUser.email : 'None'}<br>
+                <strong>Authenticated:</strong> ${authFallback.isAuthenticated() ? 'Yes' : 'No'}
+            `;
+        };
+        
+        window.testRegister = async function() {
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const name = document.getElementById('reg-name').value;
+            
+            try {
+                await authFallback.signUp(email, password, { full_name: name });
+                document.getElementById('reg-result').innerHTML = '<span class="success">Registration successful!</span>';
+                checkAuth();
+            } catch (error) {
+                document.getElementById('reg-result').innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        };
+        
+        window.testLogin = async function() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                await authFallback.signIn(email, password);
+                document.getElementById('login-result').innerHTML = '<span class="success">Login successful!</span>';
+                checkAuth();
+            } catch (error) {
+                document.getElementById('login-result').innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        };
+        
+        window.clearData = function() {
+            localStorage.removeItem('ghanahealth_users');
+            localStorage.removeItem('ghanahealth_current_user');
+            document.getElementById('auth-status').innerHTML = 'Data cleared!';
+            document.getElementById('reg-result').innerHTML = '';
+            document.getElementById('login-result').innerHTML = '';
+            setTimeout(checkAuth, 500);
+        };
+        
+        // Initial check
+        checkAuth();
+    </script>
+</body>
+</html>
