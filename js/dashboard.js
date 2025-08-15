@@ -115,10 +115,22 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('cancel-profile').addEventListener('click', closeProfileModal);
         document.getElementById('save-profile').addEventListener('click', saveProfile);
 
+        // Chat modal
+        document.getElementById('close-chat-modal').addEventListener('click', closeChatModal);
+        document.getElementById('send-message').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
         // Booking modal
         document.getElementById('close-booking-modal').addEventListener('click', closeBookingModal);
         document.getElementById('close-booking').addEventListener('click', closeBookingModal);
         document.getElementById('submit-booking').addEventListener('click', handleBookingSubmit);
+        
+        // Book appointment form submission
+        document.getElementById('book-doctor-form').addEventListener('submit', handleBookingSubmit);
 
         // Quick actions
         document.querySelectorAll('.action-card').forEach(card => {
@@ -283,17 +295,24 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleBookingSubmit(e) {
         e.preventDefault();
         
-        const formData = new FormData(e.target);
         const appointmentData = {
-            date: formData.get('appointment-date') || document.getElementById('appointment-date').value,
-            time: formData.get('appointment-time') || document.getElementById('appointment-time').value,
-            type: formData.get('appointment-type') || document.getElementById('appointment-type').value,
-            reason: formData.get('appointment-reason') || document.getElementById('appointment-reason').value
+            date: document.getElementById('appointment-date').value,
+            time: document.getElementById('appointment-time').value,
+            type: document.getElementById('appointment-type').value,
+            reason: document.getElementById('appointment-reason').value
         };
 
         // Validate form
         if (!appointmentData.date || !appointmentData.time || !appointmentData.type) {
             showToast('Please fill in all required fields', 'error');
+            return;
+        }
+
+        // Confirmation prompt
+        const doctorName = document.getElementById('booking-doctor-name').textContent.replace('Book Appointment with ', '');
+        const confirmMessage = `Confirm appointment booking:\n\nDoctor: ${doctorName}\nDate: ${appointmentData.date}\nTime: ${appointmentData.time}\nType: ${appointmentData.type}\n\nProceed with booking?`;
+        
+        if (!confirm(confirmMessage)) {
             return;
         }
 
@@ -377,14 +396,91 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Chat functionality
     function startChatWithDoctor(doctorName) {
-        showSection('chat');
+        openChatModal(doctorName);
         showToast(`Starting chat with ${doctorName}...`);
-        // In a real app, this would open a chat interface
+    }
+
+    function openChatModal(doctorName) {
+        const chatModal = document.getElementById('chat-modal');
+        const chatDoctorName = document.getElementById('chat-doctor-name');
+        const chatDoctorAvatar = document.getElementById('chat-doctor-avatar');
+        
+        chatDoctorName.textContent = doctorName;
+        chatDoctorAvatar.src = 'public/placeholder-user.jpg';
+        chatModal.classList.remove('hidden');
+        
+        // Focus on input
+        setTimeout(() => {
+            document.getElementById('chat-input').focus();
+        }, 100);
+    }
+
+    function closeChatModal() {
+        document.getElementById('chat-modal').classList.add('hidden');
+    }
+
+    function sendMessage() {
+        const chatInput = document.getElementById('chat-input');
+        const message = chatInput.value.trim();
+        
+        if (!message) return;
+        
+        const chatMessages = document.getElementById('chat-messages');
+        const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        // Add sent message
+        const sentMessage = document.createElement('div');
+        sentMessage.className = 'message sent';
+        sentMessage.innerHTML = `
+            <div class="message-content">
+                <p>${message}</p>
+                <span class="message-time">${currentTime}</span>
+            </div>
+        `;
+        
+        chatMessages.appendChild(sentMessage);
+        chatInput.value = '';
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Simulate doctor response after 2 seconds
+        setTimeout(() => {
+            const responses = [
+                "Thank you for your message. I'll review your symptoms.",
+                "Based on what you've described, I recommend...",
+                "Let me check your medical history first.",
+                "I understand your concern. Here's what I suggest...",
+                "That's a good question. Let me explain..."
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            const responseTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const receivedMessage = document.createElement('div');
+            receivedMessage.className = 'message received';
+            receivedMessage.innerHTML = `
+                <div class="message-content">
+                    <p>${randomResponse}</p>
+                    <span class="message-time">${responseTime}</span>
+                </div>
+            `;
+            
+            chatMessages.appendChild(receivedMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 2000);
     }
 
     function startNewChat() {
         showSection('doctors');
         showToast('Please select a doctor to start chatting');
+        // Update active navigation
+        document.querySelectorAll('[data-route]').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-route') === 'doctors') {
+                btn.classList.add('active');
+            }
+        });
     }
 
     // Health metrics
@@ -393,6 +489,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (metric) {
             showToast(`Health metric added: ${metric}`);
             // In a real app, this would save to the health records
+        }
+    }
+
+    // Health records
+    function addHealthRecord(recordType) {
+        const record = prompt(`Enter ${recordType.toLowerCase()} information:`);
+        if (record && record.trim()) {
+            showToast(`${recordType} record added: ${record}`);
+            // In a real app, this would save to the database
+            addRecentActivity(`${recordType} Added`, `New ${recordType.toLowerCase()} record: ${record}`);
         }
     }
 
@@ -504,6 +610,10 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('ghanahealth_current_user');
             window.location.href = 'login.html';
         }
+    };
+
+    window.addHealthRecord = function(recordType) {
+        addHealthRecord(recordType);
     };
 
     // Update profile section with user data
