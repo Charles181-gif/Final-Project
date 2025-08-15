@@ -325,6 +325,6 @@ This final year project has been instrumental in developing both technical skill
 ---
 
 **Repository**: https://github.com/Charles181-gif/Final-Project.git  
-**Live Demo**: [To be deployed]  
+**Live Demo**: (https://charles181-gif.github.io/Final-Project/)
 **Documentation**: Complete technical documentation included  
-**Last Updated**: January 2025
+**Last Updated**: Today
