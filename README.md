@@ -3,10 +3,10 @@
 
 ### Student Information
 - **Project Title**: GhanaHealth+ - Comprehensive Healthcare Platform
-- **Student Name**: [Your Name]
-- **Student ID**: [Your ID]
-- **Course**: Final Year Project
-- **Date**: January 2025
+- **Student Name**: [Prince-Charles Asiedu Odameh]  [Fianu Doreen Edem]
+- **Student ID**: [1697161612]    [1705061659]
+- **Course**: Mobile Application Development
+- **Date**: 15th August, 2025
 
 ---
 
@@ -25,7 +25,8 @@
 - Emergency Services Access
 - Real-time Chat System
 - Weather Integration
-- Responsive Design
+-Responsive Design
+-Pharmacy 
 
 ---
 
@@ -199,11 +200,12 @@ CREATE TABLE appointments (
 #### Functional Testing
 | Test Case | Description | Expected Result | Actual Result | Status |
 |-----------|-------------|-----------------|---------------|--------|
-| TC001 | User Registration | Account created successfully | Account created | ✅ Pass |
-| TC002 | User Login | User authenticated and redirected | Login successful | ✅ Pass |
-| TC003 | Doctor Search | Filtered results displayed | Results shown | ✅ Pass |
-| TC004 | Appointment Booking | Appointment scheduled | Booking confirmed | ✅ Pass |
-| TC005 | Weather Widget | Current weather displayed | Weather shown | ✅ Pass |
+| TC001 | User Registration | Account created successfully | Account created 
+| TC002 | User Login | User authenticated and redirected | Login successful 
+| TC003 | Doctor Search | Filtered results displayed | Results shown  
+| TC004 | Appointment Booking | Appointment scheduled | Booking confirmed  
+| TC005 | Weather Widget | Current weather displayed | Weather shown 
+ALL PASS
 
 #### Browser Compatibility Testing
 | Browser | Version | Status | Notes |
